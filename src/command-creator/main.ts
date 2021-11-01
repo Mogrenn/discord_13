@@ -16,7 +16,6 @@ const commands = [
 	new SlashCommandBuilder().setName("resume").setDescription("Resume current playing song"),
 	new SlashCommandBuilder().setName("leave").setDescription("Forces bot to leave voice channel"),
 ].map(c => c.toJSON());
-console.log(process.env);
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
 (async () => {

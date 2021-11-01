@@ -2,7 +2,7 @@ import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatew
 import { Client, CommandInteraction, GuildMember, Intents, VoiceChannel } from "discord.js";
 import { join } from "path";
 import { CreateSubscription, Leave, Pause, Resume, Skip } from "./music/music-handler";
-const { token } = require("../config.json");
+require("dotenv").config({path: ".env"});
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
 const secretSongActive = false;
@@ -146,4 +146,4 @@ client.on("interactionCreate", async interaction => {
     
 });
 
-client.login(token);
+client.login(process.env.TOKEN);

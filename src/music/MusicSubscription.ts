@@ -93,7 +93,6 @@ export class MusicSubscription {
 	}
 
     private async processQueue() {
-
         if (this.queue.length === 0 || this.audioPlayer.state.status !== AudioPlayerStatus.Idle || this.queueLock) return;
         this.queueLock = true;
         const nextTrack = this.queue.shift();

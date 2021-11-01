@@ -89,7 +89,7 @@ client.on("interactionCreate", async interaction => {
     try {
         switch (commandName) {
             case "ping":
-                await interaction.reply("Pong!");
+                await interaction.reply({content: "Pong!", ephemeral: true});
                 break;
             case "play":
                 interaction.deferReply();

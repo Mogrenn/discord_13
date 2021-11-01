@@ -88,7 +88,7 @@ class MusicSubscriptionSingleton {
 
     public async Skip(guildId: Snowflake, interaction: CommandInteraction) {
         if (this.musicSubscriptions.has(guildId)) {
-            this.musicSubscriptions.get(guildId).stop();
+            this.musicSubscriptions.get(guildId).audioPlayer.stop();
             await interaction.followUp(`Skipping current song`);
         } else {
             await interaction.followUp("Join a voice channel before starting to play music");
@@ -99,7 +99,7 @@ class MusicSubscriptionSingleton {
         if (this.musicSubscriptions.has(guildId)) {
             let sub = this.musicSubscriptions.get(guildId);
             sub.audioPlayer.pause();
-            await interaction.followUp(`Paused current song`);
+            await interaction.followUp({content: `Paused current song`, ephemeral: true});
         } else {
             await interaction.followUp("Join a voice channel before starting to play music");
         }
@@ -109,7 +109,7 @@ class MusicSubscriptionSingleton {
         if (this.musicSubscriptions.has(guildId)) {
             let sub = this.musicSubscriptions.get(guildId);
             sub.audioPlayer.unpause();
-            await interaction.followUp(`Resumed current song`);
+            await interaction.followUp({content: `Resumed current song`, ephemeral: true});
         } else {
             await interaction.followUp("Join a voice channel before starting to play music");
         }
@@ -119,7 +119,7 @@ class MusicSubscriptionSingleton {
         if (this.musicSubscriptions.has(guildId)) {
             let sub = this.musicSubscriptions.get(guildId);
             sub.voiceConnection.destroy();
-            await interaction.followUp(`Left current voice channel`);
+            await interaction.followUp({content: `Left current voice channel`, ephemeral: true});
         } else {
             await interaction.followUp("Join a voice channel before starting to play music");
         }

@@ -1,0 +1,35 @@
+{
+  "name": "discord-bot",
+  "version": "0.0.1",
+  "description": "Commercial_discord_bot",
+  "main": "main.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "install-commands": "ts-node src/command-creator/main.ts",
+    "start": "ts-node src/main.ts"
+  },
+  "keywords": [
+    "discord",
+    "bot",
+    "bot discord",
+    "discord bot"
+  ],
+  "author": "Mogrenn",
+  "license": "ISC",
+  "dependencies": {
+    "@discordjs/builders": "^0.6.0",
+    "@discordjs/opus": "^0.6.0",
+    "@discordjs/rest": "^0.1.0-canary.0",
+    "@discordjs/voice": "^0.6.0",
+    "discord-api-types": "^0.23.1",
+    "discord.js": "^13.1.0",
+    "dotenv": "^10.0.0",
+    "g": "^2.0.1",
+    "tweetnacl": "^1.0.3",
+    "youtube-dl-exec": "^1.2.6",
+    "ytdl-core": "^4.9.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.9.3"
+  }
+}

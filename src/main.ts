@@ -108,6 +108,8 @@ client.on("interactionCreate", async interaction => {
                 }
                 break;
             case "queue":
+                await interaction.deferReply();
+                await interaction.followUp({content: "This command has not been created yet", ephemeral: true});
                 break;
             case "skip":
                 interaction.deferReply();
@@ -146,7 +148,7 @@ client.on("interactionCreate", async interaction => {
                 break;
             case "search":
                     interaction.deferReply();
-                    
+
                     if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                         Search(interaction.guildId, interaction);
                     } else {

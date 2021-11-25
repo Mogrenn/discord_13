@@ -1,12 +1,17 @@
-import { entersState, VoiceConnection, VoiceConnectionStatus } from "@discordjs/voice";
-import { CommandInteraction, GuildMember, Interaction, Snowflake, VoiceChannel } from "discord.js";
+import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
+import YouTube = require("discord-youtube-api");
+import { CommandInteraction, GuildMember, Snowflake, VoiceChannel } from "discord.js";
 import { MusicSubscription } from "./MusicSubscription";
 import { Track } from "./track";
+require("dotenv").config({path: ".env"});
 
 class MusicSubscriptionSingleton {
     private static instance: MusicSubscriptionSingleton;
-    private musicSubscriptions = new Map<Snowflake, MusicSubscription>()
-    constructor() {}
+    private musicSubscriptions = new Map<Snowflake, MusicSubscription>();
+    private youtube: YouTube;
+    constructor() {
+        this.youtube = new YouTube(process.env.GOOGLE_API_key)
+    }
 
     public static GetInstance() {
         if (!MusicSubscriptionSingleton.instance) {
@@ -15,10 +20,10 @@ class MusicSubscriptionSingleton {
         return MusicSubscriptionSingleton.instance;
     }
 
-    async CreateSubscription(guildId: Snowflake, voiceConnection: VoiceChannel, interaction: CommandInteraction) {
+    async CreateSubscription(guildId: Snowflake, voiceConnection: VoiceChannel, interaction: CommandInteraction, playSong = true) {
         if (this.musicSubscriptions.has(guildId)) {
             this.musicSubscriptions.get(guildId)
-            this.AddSong(guildId, interaction);
+            playSong && this.AddSong(guildId, interaction);
             return;
         } else {
             this.musicSubscriptions.set(guildId, new MusicSubscription(voiceConnection, (guildId) => {
@@ -35,21 +40,23 @@ class MusicSubscriptionSingleton {
 			await interaction.followUp('Failed to join voice channel within 20 seconds, please try again later!');
 			return;
 		}
-
-        try {
-			// Attempt to create a Track from the user's video URL
-			const track = await this.CreateTrack(interaction);
-			sub.enqueue(track);
-			await interaction.followUp(`Queued **${track.title}**`);
-		} catch (error) {
-			console.warn(error);
-			await interaction.followUp('Failed to play track, please try again later!');
-		}
+        if (playSong) {
+            try {
+                // Attempt to create a Track from the user's video URL
+                const track = await this.CreateTrack(interaction);
+                sub.enqueue(track);
+                await interaction.followUp(`Queued **${track.title}**`);
+            } catch (error) {
+                console.warn(error);
+                await interaction.followUp('Failed to play track, please try again later!');
+            }
+        }
+            
 
     }
 
-    async CreateTrack(interaction: CommandInteraction) {
-        const url = interaction.options.get('song')!.value! as string;
+    async CreateTrack(interaction: CommandInteraction, urlString?: string) {
+        const url = urlString ? urlString : interaction.options.get('song')!.value! as string;
         try {
 			// Attempt to create a Track from the user's video URL
 			const track = await Track.from(url, {
@@ -125,6 +132,35 @@ class MusicSubscriptionSingleton {
         }
     }
 
+    public async Search(guildId: Snowflake, interaction: CommandInteraction) {
+        try {
+            let video = await this.youtube.searchVideos(interaction.options.get('search').value as string);
+            interaction.followUp({content: `Found song ${video.title} and queued song to play`, ephemeral: true});
+            if (this.musicSubscriptions.has(guildId)) {
+                let sub = this.musicSubscriptions.get(guildId);
+                const track = await this.CreateTrack(interaction, this.url(video.id));
+                sub.enqueue(track);
+                await interaction.followUp(`Queued **${track.title}**`);
+            } else {
+                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                    await this.CreateSubscription(guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction, false);
+                    let sub = this.musicSubscriptions.get(guildId);
+                    const track = await this.CreateTrack(interaction, this.url(video.id));
+                    sub.enqueue(track);
+                    await interaction.followUp(`Queued **${track.title}**`);
+                } else {
+                    await interaction.followUp("Join a voice channel before starting to play music");
+                }
+            }
+        } catch (e) {
+            interaction.followUp({content: "Could not find video", ephemeral: true});
+        }
+    }
+
+    url(id: string) {
+		return `https://www.youtube.com/watch?v=${id}`;
+	}
+
 }
 
 export const CreateSubscription = async (guildId: Snowflake, voiceConnection: VoiceChannel, interaction: CommandInteraction) => {
@@ -149,4 +185,8 @@ export const Resume = async (guildId: Snowflake, interaction: CommandInteraction
 
 export const Leave = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().Leave(guildId, interaction);
+}
+
+export const Search = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().Search(guildId, interaction);
 }

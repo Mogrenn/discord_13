@@ -1,12 +1,20 @@
 import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
-import { Client, CommandInteraction, GuildMember, Intents, VoiceChannel } from "discord.js";
+import { Client, GuildMember, Intents, VoiceChannel } from "discord.js";
 import { join } from "path";
-import { CreateSubscription, Leave, Pause, Resume, Skip } from "./music/music-handler";
+import { Query } from "./Database/database-connection";
+import { CreateSubscription, Leave, Pause, Resume, Search, Skip } from "./music/music-handler";
 require("dotenv").config({path: ".env"});
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
 const secretSongActive = false;
 let secretSongConnection: VoiceConnection | undefined;
+let res = Query(`
+    SELECT 
+        *
+    FROM
+        user
+`);
+console.log(res);
 
 client.once("ready", () => {
     console.log("ready");
@@ -135,6 +143,15 @@ client.on("interactionCreate", async interaction => {
                 } else {
                     await interaction.reply("You need to connect to a voice channel");
                 }
+                break;
+            case "search":
+                    interaction.deferReply();
+                    
+                    if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                        Search(interaction.guildId, interaction);
+                    } else {
+                        await interaction.reply("You need to connect to a voice channel");
+                    }
                 break;
             default:
                 await interaction.reply("Could not find command");

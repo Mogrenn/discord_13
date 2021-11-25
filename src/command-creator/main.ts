@@ -15,13 +15,17 @@ const commands = [
 	new SlashCommandBuilder().setName("pause").setDescription("Pause current playing song"),
 	new SlashCommandBuilder().setName("resume").setDescription("Resume current playing song"),
 	new SlashCommandBuilder().setName("leave").setDescription("Forces bot to leave voice channel"),
+	new SlashCommandBuilder().setName("search").setDescription("Search for a song").addStringOption(option => 
+		option.setName("search")
+		.setDescription("Text to search on")
+		.setRequired(true)	
+	),
 ].map(c => c.toJSON());
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 
 (async () => {
 	try {
 		console.log('Started refreshing application (/) commands.');
-
 		await rest.put(
 			Routes.applicationGuildCommands(process.env.CLIENT_ID, process.env.GUILD_ID),
 			{ body: commands },

@@ -157,6 +157,28 @@ class MusicSubscriptionSingleton {
         }
     }
 
+    public async Playlist(guildId: Snowflake, interaction: CommandInteraction) {
+        try {
+            let musicSubscription: MusicSubscription;
+            if (this.musicSubscriptions.has(guildId)) {
+                musicSubscription = this.musicSubscriptions.get(guildId);
+            } else {
+                await this.CreateSubscription(guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction, false);
+                musicSubscription = this.musicSubscriptions.get(guildId);
+            }
+            console.log(interaction.options.get("playlist").value as string)
+            let playlist = await this.youtube.getPlaylist(interaction.options.get("playlist").value as string);
+            console.log(playlist);
+            playlist.forEach(async e => {
+               const track = await this.CreateTrack(interaction, this.url(e.id));
+               musicSubscription.enqueue(track);
+            });
+            await interaction.followUp(`Queued Playlist`);
+        } catch(e) {
+            await interaction.followUp(`Something whent wrong when trying to queue playlist`);
+        }
+    }
+
     url(id: string) {
 		return `https://www.youtube.com/watch?v=${id}`;
 	}
@@ -189,4 +211,8 @@ export const Leave = (guildId: Snowflake, interaction: CommandInteraction) => {
 
 export const Search = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().Search(guildId, interaction);
+}
+
+export const Playlist = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().Playlist(guildId, interaction);
 }

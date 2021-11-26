@@ -20,6 +20,11 @@ const commands = [
 		.setDescription("Text to search on")
 		.setRequired(true)	
 	),
+	new SlashCommandBuilder().setName("playlist").setDescription("Play a playlist of songs").addStringOption(option => 
+		option.setName("playlist")
+		.setDescription("Enter a playlist url")
+		.setRequired(true)
+	),
 ].map(c => c.toJSON());
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 

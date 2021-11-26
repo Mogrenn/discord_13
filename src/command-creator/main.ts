@@ -31,10 +31,10 @@ const commands = [
 ].map(c => c.toJSON());
 
 //Dev server, Friends server, fake reality server
-if (["242774098772623360", "408340878797701131", "730050315411521546"].includes(process.env.GUILD_ID)) {
-	let newCommand = new SlashCommandBuilder().setName("intro").setDescription("Toggles intro song").toJSON();
-	commands.push(newCommand);
-}
+// if (["242774098772623360", "408340878797701131", "730050315411521546"].includes(process.env.GUILD_ID)) {
+// 	let newCommand = new SlashCommandBuilder().setName("intro").setDescription("Toggles intro song").toJSON();
+// 	commands.push(newCommand);
+// }
 
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 

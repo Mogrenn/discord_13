@@ -1,7 +1,6 @@
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import YouTube = require("discord-youtube-api");
-import { CommandInteraction, Guild, GuildMember, MessageEmbed, Snowflake, VoiceChannel } from "discord.js";
-import { info } from "node:console";
+import { CommandInteraction, EmbedFieldData, Guild, GuildMember, Message, MessageEmbed, Snowflake, VoiceChannel } from "discord.js";
 import { MusicSubscription } from "./MusicSubscription";
 import { Track } from "./track";
 require("dotenv").config({path: ".env"});
@@ -247,7 +246,6 @@ class MusicSubscriptionSingleton {
             queueLength += parseInt(s.info.videoDetails.lengthSeconds);
         });
         
-        let queuMinAndSec = `${(queueLength / 60).toString().split(".")[0]} min ${Math.floor(parseFloat((`0.${(queueLength / 60).toString().split(".")[1]}`??"0")) * 60)} sec`;
         const embed = new MessageEmbed()
         .setColor("#0099FF")
         .setTitle(track.title)
@@ -266,6 +264,41 @@ class MusicSubscriptionSingleton {
         .setFooter("Errors are not handled")
 
         return embed;
+    }
+
+    public async Queue(guildId: Snowflake, interaction: CommandInteraction) {
+
+        let sub = this.musicSubscriptions.get(guildId);
+        let fields: EmbedFieldData[] = [];
+
+        if (sub.queue.length === 0) {
+            await interaction.followUp("The queue is empty");
+            return;
+        }
+
+        let playtime = sub.getQueuePlaytime();
+
+        for (let i = 0; i < sub.queue.length; i++) {
+            if (i === 0) {
+                fields.push({name: "Current song", value: sub.queue[i].title});
+            } else {
+                fields.push({name: `${i+1}`, value: sub.queue[i].title});
+            }
+
+            if (i === 5 ) break;
+        }
+
+        const embed = new MessageEmbed()
+        .setColor("#0099FF")
+        .setTitle("Queue")
+        .setAuthor(interaction.member.user.username, interaction.user.avatarURL())
+        .setDescription("Showing current queue list")
+        .addField("Total queue playtime", this.GetMinAndSec(playtime))
+        .addFields(fields)
+        .setTimestamp()
+        .setFooter("Errors are not handled")
+
+        await interaction.followUp({embeds: [embed]});
     }
 
     Url(id: string) {
@@ -319,4 +352,8 @@ export const LoopSong = (guildId: Snowflake, interaction: CommandInteraction) =>
 
 export const LoopPlaylist = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().LoopPlaylist(guildId, interaction);
+}
+
+export const Queue = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().Queue(guildId, interaction);
 }

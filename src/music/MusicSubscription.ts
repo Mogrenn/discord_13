@@ -123,6 +123,14 @@ export class MusicSubscription {
 		return this.queue.length;
 	}
 
+	public getQueuePlaytime() {
+        let queueLength = 0;
+		this.queue.forEach(s => {
+            queueLength += parseInt(s.info.videoDetails.lengthSeconds);
+        });
+		return queueLength;
+	}
+
 	public stop() {
 		this.queueLock = true;
 		this.queue = [];

@@ -2,7 +2,7 @@ import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatew
 import { Client, GuildMember, Intents, VoiceChannel } from "discord.js";
 import { join } from "path";
 import { Query } from "./Database/database-connection";
-import { CreateSubscription, Leave, LoopPlaylist, LoopSong, Pause, Playlist, Resume, Search, Shuffle, Skip } from "./music/music-handler";
+import { CreateSubscription, Leave, LoopPlaylist, LoopSong, Pause, Playlist, Queue, Resume, Search, Shuffle, Skip } from "./music/music-handler";
 require("dotenv").config({path: ".env"});
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
@@ -108,7 +108,12 @@ client.on("interactionCreate", async interaction => {
                 break;
             case "queue":
                 await interaction.deferReply();
-                await interaction.followUp({content: "This command has not been created yet", ephemeral: true});
+                
+                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                    Queue(interaction.guildId, interaction);
+                } else {
+                    await interaction.reply("You need to connect to a voice channel");
+                }
                 break;
             case "skip":
                 interaction.deferReply();

@@ -179,6 +179,45 @@ class MusicSubscriptionSingleton {
         }
     }
 
+    public async LoopSong(guildId: Snowflake, interaction: CommandInteraction) {
+        if (this.musicSubscriptions.has(guildId)) {
+            let sub = this.musicSubscriptions.get(guildId);
+            if (sub.getQueue() > 0) {
+                sub.toogleLoopSong();
+            } else {
+                await interaction.followUp({content: `There is not enough songs in the queue`, ephemeral: true});
+            }
+        } else {
+            await interaction.followUp("Join a voice channel before starting to play music");
+        }
+    }
+
+    public async LoopPlaylist(guildId: Snowflake, interaction: CommandInteraction) {
+        if (this.musicSubscriptions.has(guildId)) {
+            let sub = this.musicSubscriptions.get(guildId);
+            if (sub.getQueue() > 0) {
+                sub.tooglePlaylist();
+            } else {
+                await interaction.followUp({content: `There is not enough songs in the queue`, ephemeral: true});
+            }
+        } else {
+            await interaction.followUp("Join a voice channel before starting to play music");
+        }
+    }
+
+    public async Shuffle(guildId: Snowflake, interaction: CommandInteraction) {
+        if (this.musicSubscriptions.has(guildId)) {
+            let sub = this.musicSubscriptions.get(guildId);
+            if (sub.getQueue() > 3) {
+                sub.shuffle();
+            } else {
+                await interaction.followUp({content: `There is not enough songs in the queue (Need to be atleast 3)`, ephemeral: true});
+            }
+        } else {
+            await interaction.followUp("Join a voice channel before starting to play music");
+        }
+    }
+
     url(id: string) {
 		return `https://www.youtube.com/watch?v=${id}`;
 	}
@@ -215,4 +254,16 @@ export const Search = (guildId: Snowflake, interaction: CommandInteraction) => {
 
 export const Playlist = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().Playlist(guildId, interaction);
+}
+
+export const Shuffle = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().Shuffle(guildId, interaction);
+}
+
+export const LoopSong = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().LoopSong(guildId, interaction);
+}
+
+export const LoopPlaylist = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().LoopPlaylist(guildId, interaction);
 }

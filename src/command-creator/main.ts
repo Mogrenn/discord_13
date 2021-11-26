@@ -25,6 +25,9 @@ const commands = [
 		.setDescription("Enter a playlist url")
 		.setRequired(true)
 	),
+	new SlashCommandBuilder().setName("shuffle").setDescription("Shuffle the queue"),
+	new SlashCommandBuilder().setName("loopsong").setDescription("Loop current song"),
+	new SlashCommandBuilder().setName("loopplaylist").setDescription("Loop current playlist"),
 ].map(c => c.toJSON());
 const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
 

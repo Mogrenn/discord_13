@@ -1,5 +1,6 @@
 import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, CreateAudioPlayerOptions, DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, VoiceConnection, VoiceConnectionDisconnectReason, VoiceConnectionStatus } from "@discordjs/voice";
 import { Snowflake, VoiceChannel } from "discord.js";
+import { timeStamp } from "node:console";
 import { promisify } from 'node:util';
 import { Track } from "./track";
 
@@ -11,6 +12,8 @@ export class MusicSubscription {
     public queue: Track[];
     public queueLock = false;
     public readyLock = false;
+	public loopSong = false;
+	public loopPlaylist = false;
     private remove: (guildId: Snowflake) => void;
 
     constructor(voiceChannel: VoiceChannel, remove: (guildId: Snowflake) => void) {
@@ -86,6 +89,33 @@ export class MusicSubscription {
 		void this.processQueue();
 	}
 
+	public shuffle() {
+		this.queueLock = true;
+		let currentIndex = this.queue.length,  randomIndex;
+
+		while (currentIndex != 0) {
+
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+
+			[this.queue[currentIndex], this.queue[randomIndex]] = [
+				this.queue[randomIndex], this.queue[currentIndex]];
+		}
+		this.queueLock = false;
+	}
+
+	public toogleLoopSong() {
+		this.loopSong = !this.loopSong;
+	}
+
+	public tooglePlaylist() {
+		this.loopPlaylist = !this.loopPlaylist;
+	}
+
+	public getQueue() {
+		return this.queue.length;
+	}
+
 	public stop() {
 		this.queueLock = true;
 		this.queue = [];
@@ -95,7 +125,15 @@ export class MusicSubscription {
     private async processQueue() {
         if (this.queue.length === 0 || this.audioPlayer.state.status !== AudioPlayerStatus.Idle || this.queueLock) return;
         this.queueLock = true;
-        const nextTrack = this.queue.shift();
+		let nextTrack: Track;
+		if (this.loopSong) {
+			nextTrack = this.queue[0];
+		} else if (this.loopPlaylist) {
+			nextTrack = this.queue.shift();
+			this.queue.push(nextTrack);
+		} else {
+			nextTrack = this.queue.shift();
+		}
 
         try {
             const resource = await nextTrack.createAudioResource();

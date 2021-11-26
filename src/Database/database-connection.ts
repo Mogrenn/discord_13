@@ -20,14 +20,19 @@ class DBConnection {
     }
 
     async Init(instance: DBConnection) {
-        console.log("hej")
-        instance.conn = await maria.createConnection({host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, database: process.env.DATABASE});
+        try {
+            instance.conn = await maria.createConnection({host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, database: process.env.DATABASE});
+        } catch (e) {
+        }
     }
 
-    async Query(sql: string) {
-        console.log(DBConnection.GetInstance().conn)
-        let res = await DBConnection.GetInstance().conn.query(sql);
-        return res;
+    async Query(sql: string): Promise<{success: boolean, data?: any, error?: string}> {
+        try {
+            let res = await DBConnection.GetInstance().conn.query(sql);
+            return {success: true, data: res}
+        } catch(e) {
+            return {success: false, error: "Could not connect to the database"}
+        }
     }
 
     async QueryTransaction() {
@@ -43,6 +48,6 @@ export const Test = () => {
     DBConnection.GetInstance();
 }
 
-export const Query = (sql: string) => {
-    //return DBConnection.GetInstance().Query(sql);
+export const Query = (sql: string): Promise<{success: boolean, data?: any, error?: string}> => {
+    return DBConnection.GetInstance().Query(sql);
 }

@@ -1,10 +1,11 @@
 import { AudioResource, createAudioResource, demuxProbe } from "@discordjs/voice";
 import { raw as ytdl } from "youtube-dl-exec";
-import { getInfo } from "ytdl-core";
+import { getInfo, videoInfo } from "ytdl-core";
 
 export interface TrackData {
 	url: string;
 	title: string;
+    info: videoInfo;
 	onStart: () => void;
 	onFinish: () => void;
 	onError: (error: Error) => void;
@@ -16,13 +17,15 @@ export class Track implements TrackData {
 
     public readonly url: string;
     public readonly title: string;
+    public readonly info: videoInfo;
     public readonly onStart: () => void;
     public readonly onFinish: () => void;
     public readonly onError: (error: Error) => void;
 
-    constructor({url, title, onStart, onFinish, onError}) {
+    constructor({url, title, info, onStart, onFinish, onError}) {
         this.url = url;
         this.title = title;
+        this.info = info;
         this.onStart = onStart;
         this.onFinish = onFinish;
         this.onError = onError;
@@ -66,7 +69,6 @@ export class Track implements TrackData {
 
     public static async from (url: string, methods: Pick<Track, "onStart" | "onFinish" | "onError">): Promise<Track> {
         const info = await getInfo(url);
-
         const wrappedMethods = {
             onStart() {
                 wrappedMethods.onStart = noop;
@@ -85,6 +87,7 @@ export class Track implements TrackData {
         return new Track({
             title: info.videoDetails.title,
             url,
+            info: info,
             ...wrappedMethods
         })
     }

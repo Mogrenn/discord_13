@@ -14,7 +14,6 @@ let res = Query(`
     FROM
         user
 `);
-console.log(res);
 
 client.once("ready", () => {
     console.log("ready");

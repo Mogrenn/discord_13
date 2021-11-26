@@ -73,6 +73,13 @@ export class MusicSubscription {
         this.audioPlayer.on('stateChange', (oldState, newState) => {
 			if (newState.status === AudioPlayerStatus.Idle && oldState.status !== AudioPlayerStatus.Idle) {
 				(oldState.resource as AudioResource<Track>).metadata.onFinish();
+				
+				if (!this.loopSong && !this.loopPlaylist) {
+					this.queue.shift();
+				} else if (this.loopPlaylist) {
+					let song = this.queue.shift()
+					this.queue.push(song);
+				}
 				void this.processQueue();
 			} else if (newState.status === AudioPlayerStatus.Playing) {
 				(newState.resource as AudioResource<Track>).metadata.onStart();
@@ -125,15 +132,7 @@ export class MusicSubscription {
     private async processQueue() {
         if (this.queue.length === 0 || this.audioPlayer.state.status !== AudioPlayerStatus.Idle || this.queueLock) return;
         this.queueLock = true;
-		let nextTrack: Track;
-		if (this.loopSong) {
-			nextTrack = this.queue[0];
-		} else if (this.loopPlaylist) {
-			nextTrack = this.queue.shift();
-			this.queue.push(nextTrack);
-		} else {
-			nextTrack = this.queue.shift();
-		}
+		let nextTrack = this.queue[0];
 
         try {
             const resource = await nextTrack.createAudioResource();

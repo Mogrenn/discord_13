@@ -85,9 +85,14 @@ class MusicSubscriptionSingleton {
     public async AddSong(guildId: Snowflake, interaction: CommandInteraction) {
         if (this.musicSubscriptions.has(guildId)) {
             let sub = this.musicSubscriptions.get(guildId);
-            const track = await this.CreateTrack(interaction);
-            sub.enqueue(track);
-            await interaction.followUp(`Queued **${track.title}**`);
+            try {
+                const track = await this.CreateTrack(interaction);
+                sub.enqueue(track);
+                await interaction.followUp(`Queued **${track.title}**`);
+            } catch(e) {
+                await interaction.followUp(`Could not play song`);
+            }
+            
         } else {
             await interaction.followUp("Join a voice channel before starting to play music");
         }
@@ -138,16 +143,26 @@ class MusicSubscriptionSingleton {
             interaction.followUp({content: `Found song ${video.title} and queued song to play`, ephemeral: true});
             if (this.musicSubscriptions.has(guildId)) {
                 let sub = this.musicSubscriptions.get(guildId);
-                const track = await this.CreateTrack(interaction, this.url(video.id));
-                sub.enqueue(track);
-                await interaction.followUp(`Queued **${track.title}**`);
+                try {
+                    const track = await this.CreateTrack(interaction, this.url(video.id));
+                    sub.enqueue(track);
+                    await interaction.followUp(`Queued **${track.title}**`);
+                } catch(e) {
+                    await interaction.followUp(`Could not find track`);
+                }
+                
             } else {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     await this.CreateSubscription(guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction, false);
                     let sub = this.musicSubscriptions.get(guildId);
-                    const track = await this.CreateTrack(interaction, this.url(video.id));
-                    sub.enqueue(track);
-                    await interaction.followUp(`Queued **${track.title}**`);
+                    try {
+                        const track = await this.CreateTrack(interaction, this.url(video.id));
+                        sub.enqueue(track);
+                        await interaction.followUp(`Queued **${track.title}**`);
+                    } catch(e) {
+                        await interaction.followUp(`Could not find track`);
+                    }
+                    
                 } else {
                     await interaction.followUp("Join a voice channel before starting to play music");
                 }

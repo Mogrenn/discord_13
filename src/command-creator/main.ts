@@ -28,6 +28,11 @@ const commands = [
 	new SlashCommandBuilder().setName("shuffle").setDescription("Shuffle the queue"),
 	new SlashCommandBuilder().setName("loopsong").setDescription("Loop current song"),
 	new SlashCommandBuilder().setName("loopplaylist").setDescription("Loop current playlist"),
+	new SlashCommandBuilder().setName("volume").setDescription("Change the volume").addNumberOption(option => 
+		option.setName("newvolume")
+		.setDescription("The new volume")
+		.setRequired(true)
+	)
 ].map(c => c.toJSON());
 
 //Dev server, Friends server, fake reality server

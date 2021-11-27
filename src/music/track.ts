@@ -22,7 +22,7 @@ export class Track implements TrackData {
     public readonly onFinish: () => void;
     public readonly onError: (error: Error) => void;
 
-    constructor({url, title, info, onStart, onFinish, onError}) {
+    constructor({url, title, info, onStart, onFinish, onError, volume = 50}) {
         this.url = url;
         this.title = title;
         this.info = info;
@@ -60,7 +60,7 @@ export class Track implements TrackData {
             process
 				.once('spawn', () => {
 					demuxProbe(stream)
-						.then((probe) => resolve(createAudioResource(probe.stream, { metadata: this, inputType: probe.type })))
+						.then((probe) => resolve(createAudioResource(probe.stream, { metadata: this, inputType: probe.type, inlineVolume: true })))
 						.catch(onError);
 				})
 				.catch(onError);

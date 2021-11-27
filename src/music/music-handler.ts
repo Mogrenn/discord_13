@@ -142,7 +142,7 @@ class MusicSubscriptionSingleton {
     public async Search(guildId: Snowflake, interaction: CommandInteraction) {
         try {
             let video = await this.youtube.searchVideos(interaction.options.get('search').value as string);
-            interaction.followUp({content: `Found song ${video.title} and queued song to play`, ephemeral: true});
+            await interaction.followUp({content: `Found song ${video.title} and queued song to play`, ephemeral: true});
             if (this.musicSubscriptions.has(guildId)) {
                 let sub = this.musicSubscriptions.get(guildId);
                 try {
@@ -239,12 +239,9 @@ class MusicSubscriptionSingleton {
     }
 
     public async CreateEmbed(track: Track, interaction: CommandInteraction): Promise<MessageEmbed> {
-        let queueLength = 0;
 
         let sub = this.musicSubscriptions.get((interaction.member as GuildMember).guild.id) 
-        sub.queue.forEach(s => {
-            queueLength += parseInt(s.info.videoDetails.lengthSeconds);
-        });
+        let queueLength = sub.getQueuePlaytime();
         
         const embed = new MessageEmbed()
         .setColor("#0099FF")
@@ -280,9 +277,17 @@ class MusicSubscriptionSingleton {
 
         for (let i = 0; i < sub.queue.length; i++) {
             if (i === 0) {
-                fields.push({name: "Current song", value: sub.queue[i].title});
+                fields.push(
+                    { name: "Current song:", value: sub.queue[i].title },
+                    { name: 'Duration', value: this.GetMinAndSec(parseInt(sub.queue[i].info.videoDetails.lengthSeconds)), inline: true },
+		            { name: 'Artist', value: sub.queue[i].info.videoDetails.author.name, inline: true },
+                );
             } else {
-                fields.push({name: `${i+1}`, value: sub.queue[i].title});
+                fields.push(
+                    { name: `${i+1}:`, value: sub.queue[i].title },
+                    { name: 'Duration', value: this.GetMinAndSec(parseInt(sub.queue[i].info.videoDetails.lengthSeconds)), inline: true },
+		            { name: 'Artist', value: sub.queue[i].info.videoDetails.author.name, inline: true },
+                );
             }
 
             if (i === 5 ) break;
@@ -293,12 +298,29 @@ class MusicSubscriptionSingleton {
         .setTitle("Queue")
         .setAuthor(interaction.member.user.username, interaction.user.avatarURL())
         .setDescription("Showing current queue list")
-        .addField("Total queue playtime", this.GetMinAndSec(playtime))
         .addFields(fields)
+        .addField("Total queue playtime", this.GetMinAndSec(playtime))
         .setTimestamp()
         .setFooter("Errors are not handled")
 
         await interaction.followUp({embeds: [embed]});
+    }
+
+    public async Volume(guildId: Snowflake, interaction: CommandInteraction) {
+        console.log(interaction);
+        let newVol = interaction.options.get("newvolume").value as number;
+        if(!newVol || !Number.isInteger(newVol) || newVol > 100 || newVol < 1) {
+            await interaction.followUp("You need to enter a value that doesnt exceed 100 or lower then 1");
+            return;
+        }
+
+        if (this.musicSubscriptions.has(guildId)) {
+            let sub = this.musicSubscriptions.get(guildId);
+            sub.setVolume(newVol);
+            await interaction.followUp("Volume has been changed to "+newVol);
+        } else {
+            await interaction.followUp("Bot is not connected to any voice channel in this server");
+        }
     }
 
     Url(id: string) {
@@ -356,4 +378,8 @@ export const LoopPlaylist = (guildId: Snowflake, interaction: CommandInteraction
 
 export const Queue = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().Queue(guildId, interaction);
+}
+
+export const Volume = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().Volume(guildId, interaction);
 }

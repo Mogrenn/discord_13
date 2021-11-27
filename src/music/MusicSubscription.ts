@@ -15,6 +15,8 @@ export class MusicSubscription {
 	public loopSong = false;
 	public loopPlaylist = false;
     private remove: (guildId: Snowflake) => void;
+	private volume: number;
+	private currentResource: AudioResource;
 
     constructor(voiceChannel: VoiceChannel, remove: (guildId: Snowflake) => void) {
         this.voiceConnection = joinVoiceChannel({
@@ -27,6 +29,7 @@ export class MusicSubscription {
         this.audioPlayer = createAudioPlayer();
         this.queue = [];
         this.remove = remove;
+		this.volume = 5;
 
         this.voiceConnection.on('stateChange', async (_, newState) => {
 			if (newState.status === VoiceConnectionStatus.Disconnected) {
@@ -137,6 +140,11 @@ export class MusicSubscription {
 		this.audioPlayer.stop(true);
 	}
 
+	public setVolume(newVol: number) {
+		this.currentResource && this.currentResource.volume.setVolume(newVol);
+		this.volume = newVol;
+	}
+
     private async processQueue() {
         if (this.queue.length === 0 || this.audioPlayer.state.status !== AudioPlayerStatus.Idle || this.queueLock) return;
         this.queueLock = true;
@@ -144,6 +152,8 @@ export class MusicSubscription {
 
         try {
             const resource = await nextTrack.createAudioResource();
+			this.currentResource = resource;
+			resource.volume.setVolume(this.volume);
             this.audioPlayer.play(resource as any);
             this.queueLock = false;
         } catch (e) {

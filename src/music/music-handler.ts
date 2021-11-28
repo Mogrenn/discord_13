@@ -1,6 +1,6 @@
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
 import YouTube = require("discord-youtube-api");
-import { CommandInteraction, EmbedFieldData, Guild, GuildMember, Message, MessageEmbed, Snowflake, VoiceChannel } from "discord.js";
+import { CommandInteraction, EmbedFieldData, GuildMember, MessageEmbed, Snowflake, VoiceChannel } from "discord.js";
 import { MusicSubscription } from "./MusicSubscription";
 import { Track } from "./track";
 require("dotenv").config({path: ".env"});
@@ -9,8 +9,9 @@ class MusicSubscriptionSingleton {
     private static instance: MusicSubscriptionSingleton;
     private musicSubscriptions = new Map<Snowflake, MusicSubscription>();
     private youtube: YouTube;
+
     constructor() {
-        this.youtube = new YouTube(process.env.GOOGLE_API_key)
+        this.youtube = new YouTube(process.env.GOOGLE_API_key);
     }
 
     public static GetInstance() {
@@ -52,7 +53,6 @@ class MusicSubscriptionSingleton {
                 await interaction.followUp('Failed to play track, please try again later!');
             }
         }
-            
 
     }
 
@@ -307,7 +307,6 @@ class MusicSubscriptionSingleton {
     }
 
     public async Volume(guildId: Snowflake, interaction: CommandInteraction) {
-        console.log(interaction);
         let newVol = interaction.options.get("newvolume").value as number;
         if(!newVol || !Number.isInteger(newVol) || newVol > 100 || newVol < 1) {
             await interaction.followUp("You need to enter a value that doesnt exceed 100 or lower then 1");
@@ -318,6 +317,26 @@ class MusicSubscriptionSingleton {
             let sub = this.musicSubscriptions.get(guildId);
             sub.setVolume(newVol);
             await interaction.followUp("Volume has been changed to "+newVol);
+        } else {
+            await interaction.followUp("Bot is not connected to any voice channel in this server");
+        }
+    }
+
+    public async ClearQueue(guildId: Snowflake, interaction: CommandInteraction) {
+        if (this.musicSubscriptions.has(guildId)) {
+            let sub = this.musicSubscriptions.get(guildId);
+            sub.clearQueue();
+            await interaction.followUp("Queue has been cleared");
+        } else {
+            await interaction.followUp("Bot is not connected to any voice channel in this server");
+        }
+    }
+
+    public async Jump(guildId: Snowflake, interaction: CommandInteraction) {
+        if (this.musicSubscriptions.has(guildId)) {
+            let sub = this.musicSubscriptions.get(guildId);
+            sub.jumpQueue(interaction.options.get("target").value as number);
+            await interaction.followUp(`Jumped to song ${interaction.options.get("target").value as number}`);
         } else {
             await interaction.followUp("Bot is not connected to any voice channel in this server");
         }
@@ -382,4 +401,12 @@ export const Queue = (guildId: Snowflake, interaction: CommandInteraction) => {
 
 export const Volume = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().Volume(guildId, interaction);
+}
+
+export const ClearQeuue = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().ClearQueue(guildId, interaction);
+}
+
+export const Jump = (guildId: Snowflake, interaction: CommandInteraction) => {
+    MusicSubscriptionSingleton.GetInstance().Jump(guildId, interaction);
 }

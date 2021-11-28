@@ -1,6 +1,5 @@
-import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, CreateAudioPlayerOptions, DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, VoiceConnection, VoiceConnectionDisconnectReason, VoiceConnectionStatus } from "@discordjs/voice";
+import { AudioPlayer, AudioPlayerStatus, AudioResource, createAudioPlayer, DiscordGatewayAdapterCreator, entersState, joinVoiceChannel, VoiceConnection, VoiceConnectionDisconnectReason, VoiceConnectionStatus } from "@discordjs/voice";
 import { Snowflake, VoiceChannel } from "discord.js";
-import { timeStamp } from "node:console";
 import { promisify } from 'node:util';
 import { Track } from "./track";
 
@@ -143,6 +142,18 @@ export class MusicSubscription {
 	public setVolume(newVol: number) {
 		this.currentResource && this.currentResource.volume.setVolume(newVol);
 		this.volume = newVol;
+	}
+
+	public clearQueue() {
+		this.queue = [];
+	}
+
+	public jumpQueue(jumpTarget: number) {
+		let target = jumpTarget - 1;
+
+		if (target < 0 || target > this.queue.length - 1) throw Error("Out of bounds");
+
+		this.queue = this.queue.slice(jumpTarget);
 	}
 
     private async processQueue() {

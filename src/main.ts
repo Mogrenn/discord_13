@@ -2,7 +2,7 @@ import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatew
 import { Client, GuildMember, Intents, VoiceChannel } from "discord.js";
 import { join } from "path";
 import { Query } from "./Database/database-connection";
-import { CreateSubscription, Leave, LoopPlaylist, LoopSong, Pause, Playlist, Queue, Resume, Search, Shuffle, Skip, Volume } from "./music/music-handler";
+import { ClearQeuue, CreateSubscription, Jump, Leave, LoopPlaylist, LoopSong, Pause, Playlist, Queue, Resume, Search, Shuffle, Skip, Volume } from "./music/music-handler";
 require("dotenv").config({path: ".env"});
 
 const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
@@ -103,7 +103,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     CreateSubscription(interaction.guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "queue":
@@ -112,7 +112,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Queue(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "skip":
@@ -120,7 +120,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Skip(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "pause":
@@ -129,7 +129,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Pause(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "resume":
@@ -138,7 +138,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Resume(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "leave":
@@ -147,7 +147,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Leave(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "search":
@@ -156,7 +156,7 @@ client.on("interactionCreate", async interaction => {
                     if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                         Search(interaction.guildId, interaction);
                     } else {
-                        await interaction.reply("You need to connect to a voice channel");
+                        await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                     }
                 break;
             case "playlist":
@@ -165,7 +165,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Playlist(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "shuffle":
@@ -174,7 +174,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Shuffle(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "loopsong":
@@ -183,7 +183,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     LoopSong(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "loopplaylist":
@@ -192,7 +192,7 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     LoopPlaylist(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             case "volume":
@@ -200,7 +200,23 @@ client.on("interactionCreate", async interaction => {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     Volume(interaction.guildId, interaction);
                 } else {
-                    await interaction.reply("You need to connect to a voice channel");
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
+                }
+                break;
+            case "clearqueue":
+                interaction.deferReply();
+                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                    ClearQeuue(interaction.guildId, interaction);
+                } else {
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
+                }
+                break;
+            case "jump":
+                interaction.deferReply();
+                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+                    Jump(interaction.guildId, interaction);
+                } else {
+                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
                 }
                 break;
             default:

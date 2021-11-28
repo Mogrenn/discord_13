@@ -32,6 +32,12 @@ const commands = [
 		option.setName("newvolume")
 		.setDescription("The new volume")
 		.setRequired(true)
+	),
+	new SlashCommandBuilder().setName("clearqueue").setDescription("Clears current song queue"),
+	new SlashCommandBuilder().setName("jump").setDescription("Jumps playlist to given position in current queue").addNumberOption(option => 
+		option.setName("target")
+		.setDescription("Position to jump to")
+		.setRequired(true)
 	)
 ].map(c => c.toJSON());
 

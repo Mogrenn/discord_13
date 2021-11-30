@@ -175,6 +175,7 @@ class MusicSubscriptionSingleton {
                 }
             }
         } catch (e) {
+            console.log(e);
             interaction.followUp({content: "Could not find video", ephemeral: true});
         }
     }

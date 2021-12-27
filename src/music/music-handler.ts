@@ -1,17 +1,17 @@
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
-import YouTube = require("discord-youtube-api");
 import { CommandInteraction, EmbedFieldData, GuildMember, MessageEmbed, Snowflake, VoiceChannel } from "discord.js";
 import { MusicSubscription } from "./MusicSubscription";
 import { Track } from "./track";
+import { Youtube } from "./Youtube";
 require("dotenv").config({path: ".env"});
 
 class MusicSubscriptionSingleton {
     private static instance: MusicSubscriptionSingleton;
     private musicSubscriptions = new Map<Snowflake, MusicSubscription>();
-    private youtube: YouTube;
+    private youtube: Youtube;
 
     constructor() {
-        this.youtube = new YouTube(process.env.GOOGLE_API_key);
+        this.youtube = new Youtube(process.env.GOOGLE_API_key);
     }
 
     public static GetInstance() {
@@ -141,7 +141,8 @@ class MusicSubscriptionSingleton {
 
     public async Search(guildId: Snowflake, interaction: CommandInteraction) {
         try {
-            let video = await this.youtube.searchVideos(interaction.options.get('search').value as string);
+            let video = await this.youtube.SearchVideo(interaction.options.get('search').value as string);
+            
             await interaction.followUp({content: `Found song ${video.title} and queued song to play`, ephemeral: true});
             if (this.musicSubscriptions.has(guildId)) {
                 let sub = this.musicSubscriptions.get(guildId);
@@ -189,7 +190,7 @@ class MusicSubscriptionSingleton {
                 await this.CreateSubscription(guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction, false);
                 musicSubscription = this.musicSubscriptions.get(guildId);
             }
-            let playlist = await this.youtube.getPlaylist(interaction.options.get("playlist").value as string);
+            let playlist = await this.youtube.GetPlayList(interaction.options.get("playlist").value as string);
             playlist.forEach(async e => {
                const track = await this.CreateTrack(interaction, this.Url(e.id));
                musicSubscription.enqueue(track);

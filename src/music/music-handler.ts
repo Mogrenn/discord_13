@@ -11,7 +11,7 @@ class MusicSubscriptionSingleton {
     private youtube: Youtube;
 
     constructor() {
-        this.youtube = new Youtube(process.env.GOOGLE_API_key);
+        this.youtube = new Youtube(process.env.GOOGLE_API_KEY);
     }
 
     public static GetInstance() {

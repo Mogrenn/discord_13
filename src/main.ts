@@ -28,6 +28,19 @@ client.once("ready", () => {
     console.log("ready");
 });
 
+client.on("guildCreate", (guild) => {
+    try {
+        guild.roles.create({
+            name: "bot-commander",
+            color: "DARK_AQUA",
+            reason: "This role is created so that users can use special bot commands"
+        });
+    } catch(e) {
+        
+    }
+    
+});
+
 client.on("voiceStateUpdate", (oldState, newState) => {
     if (newState.member.user.bot) return;
     if (!oldState.channelId && newState.channelId) {

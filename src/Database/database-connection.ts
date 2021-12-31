@@ -26,7 +26,7 @@ class DBConnection {
         }
     }
 
-    async Query(sql: string): Promise<{success: boolean, data?: any, error?: string}> {
+    async Query<T>(sql: string): Promise<{success: boolean, data?: T, error?: string}> {
         try {
             let res = await DBConnection.GetInstance().conn.query(sql);
             return {success: true, data: res}
@@ -48,6 +48,6 @@ export const Test = () => {
     DBConnection.GetInstance();
 }
 
-export const Query = (sql: string): Promise<{success: boolean, data?: any, error?: string}> => {
-    return DBConnection.GetInstance().Query(sql);
+export const Query = <T>(sql: string): Promise<{success: boolean, data?: T, error?: string}> => {
+    return DBConnection.GetInstance().Query<T>(sql);
 }

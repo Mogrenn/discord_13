@@ -1,19 +1,28 @@
 import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
-import { Client, GuildMember, Intents, VoiceChannel } from "discord.js";
+import { Client, Collection, CommandInteraction, Intents } from "discord.js";
 import { join } from "path";
 import { Query } from "./Database/database-connection";
-import { ClearQeuue, CreateSubscription, Jump, Leave, LoopPlaylist, LoopSong, Pause, Playlist, Queue, Resume, Search, Shuffle, Skip, Volume } from "./music/music-handler";
 require("dotenv").config({path: ".env"});
+import * as fs from "fs";
+import { SlashCommandBuilder } from "@discordjs/builders";
 
-const client = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
+interface ClientExtended extends Client {
+    commands?: Collection<string, {data: SlashCommandBuilder, execute: (interaction: CommandInteraction) => Promise<void>}>;
+}
+
+const client: ClientExtended = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
 const secretSongActive = false;
 let secretSongConnection: VoiceConnection | undefined;
-let res = Query(`
+let res = Query<{id: number, username: string}>(`
     SELECT 
         *
     FROM
         user
 `);
+
+client.commands = new Collection();
+
+
 
 client.once("ready", () => {
     console.log("ready");
@@ -91,142 +100,31 @@ client.on("interactionCreate", async interaction => {
 
     if (!interaction.isCommand() || !interaction.guildId) return;
     
-    const { commandName } = interaction;
-    
+    const command = client.commands.get(interaction.commandName);
+
     try {
-        switch (commandName) {
-            case "ping":
-                await interaction.reply({content: "Pong!", ephemeral: true});
-                break;
-            case "play":
-                interaction.deferReply();
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    CreateSubscription(interaction.guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "queue":
-                await interaction.deferReply();
-                
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Queue(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "skip":
-                interaction.deferReply();
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Skip(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "pause":
-                interaction.deferReply();
-
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Pause(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "resume":
-                interaction.deferReply();
-
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Resume(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "leave":
-                interaction.deferReply();
-
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Leave(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "search":
-                    interaction.deferReply();
-
-                    if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                        Search(interaction.guildId, interaction);
-                    } else {
-                        await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                    }
-                break;
-            case "playlist":
-                interaction.deferReply();
-
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Playlist(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "shuffle":
-                interaction.deferReply();
-
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Shuffle(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "loopsong":
-                interaction.deferReply();
-
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    LoopSong(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "loopplaylist":
-                interaction.deferReply();
-
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    LoopPlaylist(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "volume":
-                interaction.deferReply();
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Volume(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "clearqueue":
-                interaction.deferReply();
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    ClearQeuue(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            case "jump":
-                interaction.deferReply();
-                if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-                    Jump(interaction.guildId, interaction);
-                } else {
-                    await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
-                }
-                break;
-            default:
-                await interaction.reply("Could not find command");
-                break;
-        }
+        await command.execute(interaction);
     } catch(e) {
-        console.log(e);
+        await interaction.reply("Could not find command");
     }
+
     
 });
 
-client.login(process.env.TOKEN);
+async function GetCommands() {
+    const clientCommands = fs.readdirSync(`./${process.env.PROD === "true" ? "dist" : "src"}/commands`);
+    
+    let commandPromises: Array<Promise<void>> = [];
+    for (const file of clientCommands) {
+        commandPromises.push(new Promise(async (resolve) => {
+            const { Command }: {Command: {data: SlashCommandBuilder, execute: (interaction: CommandInteraction) => Promise<void>}} = await import(`./commands/${file}`);
+            client.commands!.set(Command.data.name, Command);
+            resolve();
+        }));
+    }
+
+    await Promise.all(commandPromises);
+    client.login(process.env.TOKEN);
+}
+
+GetCommands();

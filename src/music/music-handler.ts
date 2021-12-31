@@ -3,6 +3,7 @@ import { CommandInteraction, EmbedFieldData, GuildMember, MessageEmbed, Snowflak
 import { MusicSubscription } from "./MusicSubscription";
 import { Track } from "./track";
 import { Youtube } from "./Youtube";
+import { URL } from "url";
 require("dotenv").config({path: ".env"});
 
 class MusicSubscriptionSingleton {
@@ -41,6 +42,7 @@ class MusicSubscriptionSingleton {
 			await interaction.followUp('Failed to join voice channel within 20 seconds, please try again later!');
 			return;
 		}
+
         if (playSong) {
             try {
                 // Attempt to create a Track from the user's video URL
@@ -49,34 +51,43 @@ class MusicSubscriptionSingleton {
                 let embed = await this.CreateEmbed(track, interaction);
                 await interaction.followUp({embeds: [embed]});
             } catch (error) {
-                console.warn(error);
-                await interaction.followUp('Failed to play track, please try again later!');
+                if (error.message === "No valid url") {
+                    await interaction.followUp({content: "You need to enter a url, if you meant to search for song use /search", ephemeral: true});
+                } else {
+                    await interaction.followUp('Failed to play track, please try again later!');
+                }
             }
         }
-
     }
 
     async CreateTrack(interaction: CommandInteraction, urlString?: string) {
-        const url = urlString ? urlString : interaction.options.get('song')!.value! as string;
+        
         try {
-			// Attempt to create a Track from the user's video URL
-			const track = await Track.from(url, {
-				onStart() {
-					interaction.followUp({ content: 'Now playing!', ephemeral: true }).catch(console.warn);
-				},
-				onFinish() {
-					interaction.followUp({ content: 'Now finished!', ephemeral: true }).catch(console.warn);
-				},
-				onError(error) {
-					console.warn(error);
-					interaction.followUp({ content: `Error: ${error.message}`, ephemeral: true }).catch(console.warn);
-				},
-			});
-			return track;
-		} catch (error) {
-			console.warn(error);
-			await interaction.followUp('Failed to play track, please try again later!');
-		}
+            const url = urlString ? urlString : interaction.options.get('song')!.value! as string;
+
+            new URL(url);
+            try {
+                // Attempt to create a Track from the user's video URL
+                const track = await Track.from(url, {
+                    onStart() {
+                        interaction.followUp({ content: 'Now playing!', ephemeral: true }).catch(console.warn);
+                    },
+                    onFinish() {
+                        interaction.followUp({ content: 'Now finished!', ephemeral: true }).catch(console.warn);
+                    },
+                    onError(error) {
+                        console.warn(error);
+                        interaction.followUp({ content: `Error: ${error.message}`, ephemeral: true }).catch(console.warn);
+                    },
+                });
+                return track;
+            } catch (error) {
+                console.warn(error);
+                await interaction.followUp('Failed to play track, please try again later!');
+            }
+        } catch(e) {
+            throw Error("No valid url");
+        }
     }
 
     RemoveSubscription(guildId: Snowflake) {
@@ -268,6 +279,11 @@ class MusicSubscriptionSingleton {
     public async Queue(guildId: Snowflake, interaction: CommandInteraction) {
 
         let sub = this.musicSubscriptions.get(guildId);
+        if (!sub) {
+            await interaction.followUp({content: "There is no bot in this channel", ephemeral: true});
+            return;
+        }
+        console.log(sub);
         let fields: EmbedFieldData[] = [];
 
         if (sub.queue.length === 0) {
@@ -405,7 +421,7 @@ export const Volume = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().Volume(guildId, interaction);
 }
 
-export const ClearQeuue = (guildId: Snowflake, interaction: CommandInteraction) => {
+export const ClearQueue = (guildId: Snowflake, interaction: CommandInteraction) => {
     MusicSubscriptionSingleton.GetInstance().ClearQueue(guildId, interaction);
 }
 

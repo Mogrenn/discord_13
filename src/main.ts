@@ -69,9 +69,15 @@ async function GetCommands() {
     let commandPromises: Array<Promise<void>> = [];
     for (const file of clientCommands) {
         commandPromises.push(new Promise(async (resolve) => {
-            const { Command }: {Command: {data: SlashCommandBuilder, execute: (interaction: CommandInteraction) => Promise<void>}} = await import(`./commands/${file}`);
-            client.commands!.set(Command.data.name, Command);
-            resolve();
+            try {
+                const { Command }: {Command: {data: SlashCommandBuilder, execute: (interaction: CommandInteraction) => Promise<void>}} = await import(`./commands/${file}`);
+                client.commands!.set(Command.data.name, Command);
+                resolve();
+            } catch(e) {
+                console.error(e);
+                resolve();
+            }
+            
         }));
     }
 

@@ -1,7 +1,6 @@
 import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
-import { Client, Collection, CommandInteraction, Intents } from "discord.js";
+import { Client, Collection, CommandInteraction, Intents, VoiceState } from "discord.js";
 import { join } from "path";
-import { Query } from "./Database/database-connection";
 require("dotenv").config({path: ".env"});
 import * as fs from "fs";
 import { SlashCommandBuilder } from "@discordjs/builders";
@@ -13,16 +12,8 @@ interface ClientExtended extends Client {
 const client: ClientExtended = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
 const secretSongActive = false;
 let secretSongConnection: VoiceConnection | undefined;
-let res = Query<{id: number, username: string}>(`
-    SELECT 
-        *
-    FROM
-        user
-`);
 
 client.commands = new Collection();
-
-
 
 client.once("ready", () => {
     console.log("ready");
@@ -36,13 +27,13 @@ client.on("guildCreate", (guild) => {
             reason: "This role is created so that users can use special bot commands"
         });
     } catch(e) {
-        
+        console.error("Could not add roles to server");
     }
-    
 });
 
 client.on("voiceStateUpdate", (oldState, newState) => {
     if (newState.member.user.bot) return;
+
     if (!oldState.channelId && newState.channelId) {
         if (secretSongConnection && newState.channel.members.size > 2) {
             secretSongConnection.disconnect();
@@ -51,61 +42,11 @@ client.on("voiceStateUpdate", (oldState, newState) => {
         }
 
         if (secretSongActive && newState.channel.members.size === 2 && newState.channel.members.some(u => u.id === "226326393783451648") && newState.channel.members.some(u => u.id === "443816218646937602")) {
-            secretSongConnection = joinVoiceChannel({
-                channelId: newState.channelId,
-                guildId: newState.guild.id,
-                adapterCreator: newState.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
-                selfDeaf: false,
-                selfMute: false,
-            });
-
-            const player = createAudioPlayer();
-            player.on("error", error => {
-                console.log(error);
-            }).on(AudioPlayerStatus.Idle, () => {
-                secretSongConnection.disconnect();
-                secretSongConnection.destroy();
-            });
-    
-            const audio = createAudioResource(join(__dirname, "sound/speechless.mp3"));
-            audio.playStream.on('error', error => {
-                console.error('Error:', error.message);
-            });
-    
-            player.play(audio);
-            secretSongConnection.subscribe(player);
+            PlaySong(newState, "sound/speechless.mp3");
         } else if (newState.member.user.id === "443816218646937602" && newState.channel.members.size > 1) {
-            const con = joinVoiceChannel({
-                channelId: newState.channelId,
-                guildId: newState.guild.id,
-                adapterCreator: newState.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
-                selfDeaf: false,
-                selfMute: false,
-            });
-    
-            const player = createAudioPlayer();
-            player.on("error", error => {
-                console.log(error);
-            }).on(AudioPlayerStatus.Idle, () => {
-                con.disconnect();
-                con.destroy();
-            });
-    
-            const audio = createAudioResource(join(__dirname, "sound/Cherry_bitch.mp3"));
-            audio.playStream.on('error', error => {
-                console.error('Error:', error.message);
-            });
-
-            player.play(audio);
-            con.subscribe(player);
+            PlaySong(newState, Math.floor(Math.random()*100)+1 === 99 ? "sound/theme.mp3" : "sound/Cherry_bitch.mp3");
         }
-    } else if (oldState.channelId && !newState.channelId) {
-        //If user leaves
-        // if (secretSongConnection && oldState.channel.members.size < 2) {
-        //     secretSongConnection.disconnect();
-        //     secretSongConnection.destroy();
-        //     secretSongConnection = undefined;
-        // }
+
     }
  });
 
@@ -120,8 +61,6 @@ client.on("interactionCreate", async interaction => {
     } catch(e) {
         await interaction.reply("Could not find command");
     }
-
-    
 });
 
 async function GetCommands() {
@@ -138,6 +77,32 @@ async function GetCommands() {
 
     await Promise.all(commandPromises);
     client.login(process.env.TOKEN);
+}
+
+async function PlaySong(newState: VoiceState, songPath: string) {
+    const con = joinVoiceChannel({
+        channelId: newState.channelId,
+        guildId: newState.guild.id,
+        adapterCreator: newState.guild.voiceAdapterCreator as unknown as DiscordGatewayAdapterCreator,
+        selfDeaf: false,
+        selfMute: false,
+    });
+
+    const player = createAudioPlayer();
+    player.on("error", error => {
+        console.log(error);
+    }).on(AudioPlayerStatus.Idle, () => {
+        con.disconnect();
+        con.destroy();
+    });
+
+    const audio = createAudioResource(join(__dirname, songPath));
+    audio.playStream.on('error', error => {
+        console.error('Error:', error.message);
+    });
+
+    player.play(audio);
+    con.subscribe(player);
 }
 
 GetCommands();

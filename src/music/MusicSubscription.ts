@@ -28,7 +28,7 @@ export class MusicSubscription {
         this.audioPlayer = createAudioPlayer();
         this.queue = [];
         this.remove = remove;
-		this.volume = 5;
+		this.volume = 1;
 
         this.voiceConnection.on('stateChange', async (_, newState) => {
 			if (newState.status === VoiceConnectionStatus.Disconnected) {
@@ -140,8 +140,8 @@ export class MusicSubscription {
 	}
 
 	public setVolume(newVol: number) {
-		this.currentResource && this.currentResource.volume.setVolume(newVol);
-		this.volume = newVol;
+		this.volume = newVol > 100 ? 1 : newVol * 0.01;
+		this.currentResource && this.currentResource.volume.setVolume(this.volume);
 	}
 
 	public clearQueue() {

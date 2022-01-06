@@ -73,7 +73,7 @@ class MusicSubscriptionSingleton {
                         interaction.followUp({ content: 'Now playing!', ephemeral: true }).catch(console.warn);
                     },
                     onFinish() {
-                        interaction.followUp({ content: 'Now finished!', ephemeral: true }).catch(console.warn);
+                        // interaction.followUp({ content: 'Now finished!', ephemeral: true }).catch(console.warn);
                     },
                     onError(error) {
                         console.warn(error);
@@ -334,7 +334,7 @@ class MusicSubscriptionSingleton {
         if (this.musicSubscriptions.has(guildId)) {
             let sub = this.musicSubscriptions.get(guildId);
             sub.setVolume(newVol);
-            await interaction.followUp("Volume has been changed to "+newVol);
+            await interaction.followUp(`Volume has been changed to ${newVol}`);
         } else {
             await interaction.followUp("Bot is not connected to any voice channel in this server");
         }

@@ -13,8 +13,13 @@ const command = {
         ),
     async execute(interaction: CommandInteraction) {
         interaction.deferReply();
+
+        if (!(interaction.member instanceof GuildMember /*&& interaction.member.roles.cache.some(role => role.name === "bot-commander")*/)) {
+            await interaction.followUp({content: "You dont have access to this command", ephemeral: true});
+            return;
+        }
         
-        if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
+        if (interaction.member.voice.channel) {
             Volume(interaction.guildId, interaction);
         } else {
             await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});

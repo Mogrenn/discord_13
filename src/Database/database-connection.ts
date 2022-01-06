@@ -36,11 +36,19 @@ class DBConnection {
     }
 
     async QueryTransaction() {
-
+        
     }
 
-    async ExecuteTransaciton() {
-        
+    async ExecuteTransaction(con: maria.Connection, query: () => void) {
+        con.beginTransaction();
+
+        try {
+            query();
+            con.commit();
+        } catch(e) {
+            con.rollback();
+            console.log(e);
+        }
     }
 }
 

@@ -19,9 +19,9 @@ client.once("ready", () => {
     console.log("ready");
 });
 
-client.on("guildCreate", (guild) => {
+client.on("guildCreate", async (guild) => {
     try {
-        guild.roles.create({
+        await guild.roles.create({
             name: "bot-commander",
             color: "DARK_AQUA",
             reason: "This role is created so that users can use special bot commands"

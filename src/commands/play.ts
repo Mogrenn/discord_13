@@ -6,14 +6,14 @@ const command = {
     data: new SlashCommandBuilder()
         .setName("play")
         .setDescription("Request a song")
-        .addStringOption(option => 
+        .addStringOption(option =>
 		    option.setName("song")
 			.setDescription("The song url to be played")
 			.setRequired(true)
 	    ),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
-        
+        await interaction.deferReply();
+
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             CreateSubscription(interaction.guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction);
         } else {

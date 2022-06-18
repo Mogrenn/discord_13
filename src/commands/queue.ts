@@ -7,8 +7,8 @@ const command = {
         .setName("queue")
         .setDescription("Display the current queue"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
-                
+        await interaction.deferReply();
+
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Queue(interaction.guildId, interaction);
         } else {

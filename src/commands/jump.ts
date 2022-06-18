@@ -1,19 +1,19 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, GuildMember } from "discord.js";
-import { ClearQueue, Jump } from "../music/music-handler";
+import { Jump } from "../music/music-handler";
 
 const command = {
     data: new SlashCommandBuilder()
         .setName("jump")
         .setDescription("Jumps playlist to given position in current queue")
-        .addNumberOption(option => 
+        .addNumberOption(option =>
             option.setName("target")
             .setDescription("Position to jump to")
             .setRequired(true)
         ),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
-        
+        await interaction.deferReply();
+
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Jump(interaction.guildId, interaction);
         } else {

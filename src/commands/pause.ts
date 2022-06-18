@@ -7,7 +7,7 @@ const command = {
         .setName("pause")
         .setDescription("Pause current playing song"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Pause(interaction.guildId, interaction);

@@ -7,8 +7,8 @@ const command = {
         .setName("clearqueue")
         .setDescription("Clears current song queue"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
-        
+        await interaction.deferReply();
+
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             ClearQueue(interaction.guildId, interaction);
         } else {

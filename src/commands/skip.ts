@@ -7,8 +7,8 @@ const command = {
         .setName("skip")
         .setDescription("Skip current song"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
-        
+        await interaction.deferReply();
+
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Skip(interaction.guildId, interaction);
         } else {

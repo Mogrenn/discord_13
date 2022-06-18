@@ -7,7 +7,7 @@ const command = {
         .setName("resume")
         .setDescription("Resume current playing song"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Resume(interaction.guildId, interaction);

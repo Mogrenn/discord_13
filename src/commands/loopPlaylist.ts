@@ -7,7 +7,7 @@ const command = {
         .setName("loopplaylist")
         .setDescription("Loop current playlist"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             LoopPlaylist(interaction.guildId, interaction);

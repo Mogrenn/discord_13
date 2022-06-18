@@ -25,7 +25,7 @@ class MusicSubscriptionSingleton {
     async CreateSubscription(guildId: Snowflake, voiceConnection: VoiceChannel, interaction: CommandInteraction, playSong = true) {
         if (this.musicSubscriptions.has(guildId)) {
             this.musicSubscriptions.get(guildId)
-            playSong && this.AddSong(guildId, interaction);
+            playSong && await this.AddSong(guildId, interaction);
             return;
         } else {
             this.musicSubscriptions.set(guildId, new MusicSubscription(voiceConnection, (guildId) => {
@@ -61,14 +61,14 @@ class MusicSubscriptionSingleton {
     }
 
     async CreateTrack(interaction: CommandInteraction, urlString?: string) {
-        
+
         try {
             const url = urlString ? urlString : interaction.options.get('song')!.value! as string;
 
             new URL(url);
             try {
                 // Attempt to create a Track from the user's video URL
-                const track = await Track.from(url, {
+                return await Track.from(url, {
                     onStart() {
                         interaction.followUp({ content: 'Now playing!', ephemeral: true }).catch(console.warn);
                     },
@@ -80,7 +80,6 @@ class MusicSubscriptionSingleton {
                         interaction.followUp({ content: `Error: ${error.message}`, ephemeral: true }).catch(console.warn);
                     },
                 });
-                return track;
             } catch (error) {
                 console.warn(error);
                 await interaction.followUp('Failed to play track, please try again later!');
@@ -105,7 +104,7 @@ class MusicSubscriptionSingleton {
             } catch(e) {
                 await interaction.followUp(`Could not play song`);
             }
-            
+
         } else {
             await interaction.followUp("Join a voice channel before starting to play music");
         }
@@ -153,7 +152,7 @@ class MusicSubscriptionSingleton {
     public async Search(guildId: Snowflake, interaction: CommandInteraction) {
         try {
             let video = await this.youtube.SearchVideo(interaction.options.get('search').value as string);
-            
+
             await interaction.followUp({content: `Found song ${video.title} and queued song to play`, ephemeral: true});
             if (this.musicSubscriptions.has(guildId)) {
                 let sub = this.musicSubscriptions.get(guildId);
@@ -166,7 +165,7 @@ class MusicSubscriptionSingleton {
                     console.log(e)
                     await interaction.followUp(`Could not find track`);
                 }
-                
+
             } else {
                 if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
                     await this.CreateSubscription(guildId, (interaction.member as GuildMember).voice.channel as VoiceChannel, interaction, false);
@@ -181,7 +180,7 @@ class MusicSubscriptionSingleton {
 
                         await interaction.followUp(`Could not find track`);
                     }
-                    
+
                 } else {
                     await interaction.followUp("Join a voice channel before starting to play music");
                 }
@@ -253,10 +252,10 @@ class MusicSubscriptionSingleton {
 
     public async CreateEmbed(track: Track, interaction: CommandInteraction): Promise<MessageEmbed> {
 
-        let sub = this.musicSubscriptions.get((interaction.member as GuildMember).guild.id) 
+        let sub = this.musicSubscriptions.get((interaction.member as GuildMember).guild.id)
         let queueLength = sub.getQueuePlaytime();
-        
-        const embed = new MessageEmbed()
+
+        return new MessageEmbed()
         .setColor("#0099FF")
         .setTitle(track.title)
         .setURL(track.url)
@@ -272,8 +271,6 @@ class MusicSubscriptionSingleton {
         .setImage(track.info.thumbnail_url)
         .setTimestamp()
         .setFooter("Errors are not handled")
-
-        return embed;
     }
 
     public async Queue(guildId: Snowflake, interaction: CommandInteraction) {

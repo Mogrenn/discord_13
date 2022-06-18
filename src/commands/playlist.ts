@@ -6,13 +6,13 @@ const command = {
     data: new SlashCommandBuilder()
         .setName("playlist")
         .setDescription("Play a playlist of songs")
-        .addStringOption(option => 
+        .addStringOption(option =>
             option.setName("playlist")
             .setDescription("Enter a playlist url")
             .setRequired(true)
         ),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Playlist(interaction.guildId, interaction);

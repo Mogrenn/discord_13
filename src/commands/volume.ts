@@ -6,19 +6,19 @@ const command = {
     data: new SlashCommandBuilder()
         .setName("volume")
         .setDescription("Change the volume")
-        .addNumberOption(option => 
+        .addNumberOption(option =>
             option.setName("newvolume")
             .setDescription("The new volume")
             .setRequired(true)
         ),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (!(interaction.member instanceof GuildMember /*&& interaction.member.roles.cache.some(role => role.name === "bot-commander")*/)) {
             await interaction.followUp({content: "You dont have access to this command", ephemeral: true});
             return;
         }
-        
+
         if (interaction.member.voice.channel) {
             Volume(interaction.guildId, interaction);
         } else {

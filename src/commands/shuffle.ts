@@ -7,7 +7,7 @@ const command = {
         .setName("shuffle")
         .setDescription("Shuffle the queue"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Shuffle(interaction.guildId, interaction);

@@ -7,7 +7,7 @@ const command = {
         .setName("leave")
         .setDescription("Forces bot to leave voice channel"),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Leave(interaction.guildId, interaction);

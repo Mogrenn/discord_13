@@ -19,10 +19,16 @@ class DBConnection {
         return DBConnection.instance;
     }
 
-    async Init(instance: DBConnection) {
+    async Init(instance: DBConnection, retries = 3) {
         try {
             instance.conn = await maria.createConnection({host: process.env.HOST, user: process.env.USER, password: process.env.PASSWORD, database: process.env.DATABASE});
         } catch (e) {
+            if (retries > 0) {
+                this.Init(instance, retries--);
+            } else {
+                console.log("Could not connect to db");
+                process.exit(1);
+            }
         }
     }
 
@@ -36,18 +42,18 @@ class DBConnection {
     }
 
     async QueryTransaction() {
-        
+
     }
 
     async ExecuteTransaction(con: maria.Connection, query: () => void) {
-        con.beginTransaction();
+        await con.beginTransaction();
 
         try {
             query();
-            con.commit();
+            await con.commit();
         } catch(e) {
-            con.rollback();
             console.log(e);
+            await con.rollback();
         }
     }
 }

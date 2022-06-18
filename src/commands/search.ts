@@ -6,13 +6,13 @@ const command = {
     data: new SlashCommandBuilder()
         .setName("search")
         .setDescription("Search for a song")
-        .addStringOption(option => 
+        .addStringOption(option =>
             option.setName("search")
             .setDescription("Text to search on")
-            .setRequired(true)	
+            .setRequired(true)
 	    ),
     async execute(interaction: CommandInteraction) {
-        interaction.deferReply();
+        await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
             Search(interaction.guildId, interaction);

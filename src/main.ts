@@ -117,7 +117,7 @@ async function PlaySong(newState: VoiceState, songPath: string) {
     audio.playStream.on('error', error => {
         console.error('Error:', error.message);
     });
-
+    audio.volume.setVolume(0.5);
     player.play(audio);
     con.subscribe(player);
 }

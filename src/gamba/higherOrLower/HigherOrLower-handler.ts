@@ -5,15 +5,17 @@ const currentGames = new Map<Snowflake, HigherOrLower>();
 
 export async function StartGame(interaction: CommandInteraction) {
     const user = interaction.user;
+    currentGames.set(user.id, new HigherOrLower(user, await interaction.options.get("bet")!.value! as number, interaction));
+}
 
+export async function Guess(interaction: CommandInteraction, guess: string) {
+    const user = interaction.user;
 
     if (!currentGames.has(user.id)) {
-        const game = currentGames.get(user.id);
-        const res = await game.guess("");
-        if (res) {
-
-        }
+        await interaction.followUp({content: "You need to start a game"});
     } else {
-        currentGames.set(user.id, new HigherOrLower(user, 100, interaction));
+        const game = currentGames.get(user.id);
+        await game.guess(guess);
+        currentGames.delete(user.id);
     }
 }

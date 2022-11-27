@@ -1,34 +1,41 @@
 import {CommandInteraction, User} from "discord.js";
+import {addTransaction} from "../../functions/economy-handler";
 
 export class HigherOrLower {
     private user: User;
-    private bet: Number;
-    private number = Math.ceil(Math.random()*100)+1;
-    private guesses = 3;
+    private readonly bet: number;
+    private firstNumber = this.GetNumber();
     private commandInteraction: CommandInteraction;
 
-    constructor(user: User, bet: Number, interaction: CommandInteraction) {
+    constructor(user: User, bet: number, interaction: CommandInteraction) {
         this.user = user;
         this.bet = bet;
         this.commandInteraction = interaction;
-        this.commandInteraction.followUp({content: "Guess a number between 1 - 100"});
+        this.commandInteraction.followUp({content: `Higher or lower than ${this.firstNumber}`});
     }
 
     public async guess(guess: string) {
-        const temp = parseInt(guess);
-        if (temp === this.number) {
-            await  this.commandInteraction.followUp({content: `You guessed to low. You have ${this.guesses} left`});
-            return true;
-        } else if (this.guesses > 0) {
-            this.guesses--;
-            if (temp > this.number) {
-                await  this.commandInteraction.followUp({content: `You guessed to high. You have ${this.guesses} left`});
-            } else {
-                await  this.commandInteraction.followUp({content: `You guessed to low. You have ${this.guesses} left`});
-            }
+        const number2 = this.GetNumber();
+        let won = false;
+        if (guess === "higher" && number2 > this.firstNumber || guess === "lower" &&number2 < this.firstNumber) {
+            await this.commandInteraction.followUp({content: "You won. The number is "+number2});
+            won = true;
         } else {
-            await this.commandInteraction.reply({content: `You lost. The number was ${this.number}`});
+            await this.commandInteraction.followUp({content: `You lost, the number was ${number2}`});
         }
-        return false;
+
+        await addTransaction(this.user.id, won ? this.bet : this.bet * -1);
+
+    }
+
+    private GetNumber() {
+        if (this.firstNumber === undefined) return Math.ceil(Math.random()*100)+1;
+
+        const number = Math.ceil(Math.random()*100)+1;
+        if (number === this.firstNumber) {
+            return this.GetNumber();
+        }
+
+        return number;
     }
 }

@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, GuildMember } from "discord.js";
-import { Volume } from "../music/music-handler";
+import { Volume } from "../../music/music-handler";
 
 const command = {
     data: new SlashCommandBuilder()

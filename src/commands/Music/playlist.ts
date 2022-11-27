@@ -1,16 +1,21 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, GuildMember } from "discord.js";
-import { Resume } from "../music/music-handler";
+import { Playlist } from "../../music/music-handler";
 
 const command = {
     data: new SlashCommandBuilder()
-        .setName("resume")
-        .setDescription("Resume current playing song"),
+        .setName("playlist")
+        .setDescription("Play a playlist of songs")
+        .addStringOption(option =>
+            option.setName("playlist")
+            .setDescription("Enter a playlist url")
+            .setRequired(true)
+        ),
     async execute(interaction: CommandInteraction) {
         await interaction.deferReply();
 
         if (interaction.member instanceof GuildMember && interaction.member.voice.channel) {
-            Resume(interaction.guildId, interaction);
+            Playlist(interaction.guildId, interaction);
         } else {
             await interaction.followUp({content: "You need to connect to a voice channel", ephemeral: true});
         }

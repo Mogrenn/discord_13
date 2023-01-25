@@ -4,6 +4,7 @@ import { join } from "path";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { GetFiles } from "./Common";
 import { GameShowJoin } from "./Common/discord-functions";
+import config from "../config";
 require("dotenv").config({path: ".env"});
 
 interface ClientExtended extends Client {
@@ -23,11 +24,11 @@ client.once("ready", async (client) => {
 
 client.on("guildCreate", async (guild) => {
     try {
-        await guild.roles.create({
-            name: "bot-commander",
-            color: "DARK_AQUA",
-            reason: "This role is created so that users can use special bot commands"
-        });
+        // await guild.roles.create({
+        //     name: "bot-commander",
+        //     color: "DARK_AQUA",
+        //     reason: "This role is created so that users can use special bot commands"
+        // });
         await GameShowJoin(guild);
     } catch(e) {
         console.error("Could not add roles to server");
@@ -47,6 +48,9 @@ client.on("voiceStateUpdate", async (oldState, newState) => {
         if (secretSongActive && newState.channel.members.size === 2 && newState.channel.members.some(u => u.id === "226326393783451648") && newState.channel.members.some(u => u.id === "443816218646937602")) {
             await PlaySong(newState, "sound/speechless.mp3");
         } else if (newState.member.user.id === "443816218646937602" && newState.channel.members.size > 1) {
+            
+            if (!config.ActiveModules.CherryBitch.Active || !config.ActiveModules.CherryBitch.Servers.includes(newState.guild.id)) return;
+
             await PlaySong(newState, Math.floor(Math.random() * 100) + 1 === 99 ? "sound/theme.mp3" : "sound/Cherry_bitch.mp3");
         }
 

@@ -1,5 +1,5 @@
 import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
-import { Client, Collection, CommandInteraction, Intents, VoiceState } from "discord.js";
+import { Client, Collection, CommandInteraction, GatewayIntentBits, VoiceState } from "discord.js";
 import { join } from "path";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { GetFiles } from "./Common";
@@ -11,7 +11,7 @@ interface ClientExtended extends Client {
     commands?: Collection<string, {data: SlashCommandBuilder, execute: (interaction: CommandInteraction) => Promise<void>}>;
 }
 
-const client: ClientExtended = new Client({intents: [Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILD_VOICE_STATES]});
+const client: ClientExtended = new Client({intents: [GatewayIntentBits.Guilds, GatewayIntentBits.GuildMessages, GatewayIntentBits.GuildVoiceStates]});
 const secretSongActive = false;
 let secretSongConnection: VoiceConnection | undefined;
 

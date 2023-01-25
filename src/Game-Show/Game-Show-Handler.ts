@@ -1,5 +1,4 @@
-import { Snowflake } from "discord-api-types";
-import { CommandInteraction } from "discord.js";
+import { CommandInteraction, Snowflake } from "discord.js";
 import { GameShow } from "./GameShow";
 
 class GameShowSingleton {

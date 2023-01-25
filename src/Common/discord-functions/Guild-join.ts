@@ -1,4 +1,4 @@
-import { Client, Guild, Role } from "discord.js";
+import { ChannelType, Client, Guild, Role } from "discord.js";
 import { gameShowRoleName, gameShowNameMaster, gameShowPublic } from "../consts";
 import { CreateChannel } from "./Guild-Channel";
 
@@ -21,7 +21,7 @@ async function GameShowCreateRoleAndChannel(guild: Guild) {
     });
 
     guild.channels.cache.forEach(channel => {
-        if (channel.type === "GUILD_TEXT") {
+        if (channel.type === ChannelType.GuildText) {
             if (channel.name === gameShowNameMaster) gameShowMasterFound = true;
             if (channel.name === gameShowPublic) gameShowPublicFound = true;
         }
@@ -31,7 +31,7 @@ async function GameShowCreateRoleAndChannel(guild: Guild) {
     if (!gameMasterRoleFound) {
         gameMaster = await guild.roles.create({
             name: gameShowRoleName,
-            permissions: "ADMINISTRATOR"
+            permissions: "Administrator"
         });
         await guild.roles.create({
             name: "game-show-participant",
@@ -43,21 +43,24 @@ async function GameShowCreateRoleAndChannel(guild: Guild) {
     if (!gameShowMasterFound) {
         if (!gameMaster) gameMaster =  guild.roles.cache.find(r => r.name === gameShowRoleName);
 
-        await CreateChannel(guild, gameShowNameMaster, {
+        await CreateChannel(guild, {
+            name: gameShowNameMaster,
             permissionOverwrites: [
                 {
                     id: gameMaster.id,
-                    allow: ['VIEW_CHANNEL']
+                    allow: ['ViewChannel']
                 },
                 {
                     id: everyone.id,
-                    deny: ['VIEW_CHANNEL']
+                    deny: ['ViewChannel']
                 }
             ]
         });
     }
 
     if (!gameShowPublicFound) {
-        await CreateChannel(guild, gameShowPublic, {});
+        await CreateChannel(guild, {
+            name: gameShowPublic
+        });
     }
 }

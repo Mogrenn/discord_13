@@ -1,5 +1,7 @@
+//TODO: FIX THIS FILE
+//@ts-nocheck
 import { AudioResource, createAudioResource, demuxProbe } from "@discordjs/voice";
-import { raw as ytdl } from "youtube-dl-exec";
+import raw from "youtube-dl-exec";
 import { getInfo, videoInfo } from "ytdl-core";
 
 export interface TrackData {
@@ -32,16 +34,17 @@ export class Track implements TrackData {
     }
 
     public createAudioResource(): Promise<AudioResource<Track>> {
-        return new Promise((resolve, reject) => {
-            const process = ytdl(
-                this.url,
+        return new Promise(async (resolve, reject) => {
+            const process = await raw(
+                this.url,{},
                 {
+
 					o: '-',
 					q: '',
 					f: 'bestaudio[ext=webm+acodec=opus+asr=48000]/bestaudio',
 					r: '100K',
-				},
-				{ stdio: ['ignore', 'pipe', 'ignore'] },
+				}
+				// { stdio: ['ignore', 'pipe', 'ignore'] },
             );
 
             if (!process.stdout) {

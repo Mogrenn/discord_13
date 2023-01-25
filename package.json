@@ -17,19 +17,19 @@
   "author": "Mogrenn",
   "license": "ISC",
   "dependencies": {
-    "@discordjs/builders": "^0.6.0",
-    "@discordjs/opus": "^0.6.0",
-    "@discordjs/rest": "^0.1.0-canary.0",
-    "@discordjs/voice": "^0.6.0",
+    "@discordjs/builders": "^1.4.0",
+    "@discordjs/opus": "^0.9.0",
+    "@discordjs/rest": "^1.5.0",
+    "@discordjs/voice": "^0.14.0",
     "axios": "^0.24.0",
-    "discord-api-types": "^0.23.1",
-    "discord.js": "^13.1.0",
+    "discord-api-types": "^0.37.29",
+    "discord.js": "^14.7.1",
     "dotenv": "^10.0.0",
     "g": "^2.0.1",
     "mariadb": "^2.5.5",
     "tweetnacl": "^1.0.3",
-    "youtube-dl-exec": "^1.2.6",
-    "ytdl-core": "^4.9.2"
+    "youtube-dl-exec": "^2.1.11",
+    "ytdl-core": "^4.11.2"
   },
   "devDependencies": {
     "@types/node": "^16.9.3"

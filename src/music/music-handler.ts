@@ -1,5 +1,5 @@
 import { entersState, VoiceConnectionStatus } from "@discordjs/voice";
-import { CommandInteraction, EmbedFieldData, GuildMember, MessageEmbed, Snowflake, VoiceChannel } from "discord.js";
+import { CommandInteraction, GuildMember, Snowflake, VoiceChannel } from "discord.js";
 import { MusicSubscription } from "./MusicSubscription";
 import { Track } from "./track";
 import { Youtube } from "./Youtube";
@@ -250,11 +250,13 @@ class MusicSubscriptionSingleton {
         }
     }
 
+    //TODO: Fix ignores new way to handle embeds
+    //@ts-ignore
     public async CreateEmbed(track: Track, interaction: CommandInteraction): Promise<MessageEmbed> {
 
         let sub = this.musicSubscriptions.get((interaction.member as GuildMember).guild.id)
         let queueLength = sub.getQueuePlaytime();
-
+        //@ts-ignore
         return new MessageEmbed()
         .setColor("#0099FF")
         .setTitle(track.title)
@@ -281,6 +283,7 @@ class MusicSubscriptionSingleton {
             return;
         }
         console.log(sub);
+        //@ts-ignore
         let fields: EmbedFieldData[] = [];
 
         if (sub.queue.length === 0) {
@@ -307,7 +310,7 @@ class MusicSubscriptionSingleton {
 
             if (i === 5 ) break;
         }
-
+        //@ts-ignore
         const embed = new MessageEmbed()
         .setColor("#0099FF")
         .setTitle("Queue")

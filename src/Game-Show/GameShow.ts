@@ -1,5 +1,4 @@
-import { Snowflake } from "discord-api-types";
-import { CommandInteraction, Guild, GuildChannel, MessageEmbed, ThreadChannel } from "discord.js";
+import { CommandInteraction, Guild, GuildChannel, Snowflake, ThreadChannel } from "discord.js";
 import { gameShowPublic } from "../Common";
 
 export class GameShow {
@@ -26,9 +25,7 @@ export class GameShow {
         const fields = this.result.map(ans => {
             return {name: this.guild.members.cache.find(member => member.id === ans.userId).user.username, value: ans.answer, inline: true}
         });
-        const embed = new MessageEmbed()
-        .setTitle("Result from question")
-        .addFields(fields);
+        
 
         //TODO: Send it to channel
         this.result = [];

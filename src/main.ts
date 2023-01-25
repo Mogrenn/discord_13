@@ -1,5 +1,5 @@
 import { AudioPlayerStatus, createAudioPlayer, createAudioResource, DiscordGatewayAdapterCreator, joinVoiceChannel, VoiceConnection } from "@discordjs/voice";
-import { Client, Collection, CommandInteraction, GatewayIntentBits, VoiceState } from "discord.js";
+import { ChannelType, Client, Collection, CommandInteraction, GatewayIntentBits, TextChannel, VoiceState } from "discord.js";
 import { join } from "path";
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { GetFiles } from "./Common";

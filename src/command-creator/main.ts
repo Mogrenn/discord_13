@@ -38,7 +38,8 @@ const commands = [
 		option.setName("target")
 		.setDescription("Position to jump to")
 		.setRequired(true)
-	)
+	),
+	new SlashCommandBuilder().setName("startgameshow").setDescription("Starts a game show"),
 ].map(c => c.toJSON());
 
 //Dev server, Friends server, fake reality server
@@ -47,7 +48,7 @@ const commands = [
 // 	commands.push(newCommand);
 // }
 
-const rest = new REST({ version: '9' }).setToken(process.env.TOKEN);
+const rest = new REST({ version: '10' }).setToken(process.env.TOKEN);
 
 (async () => {
 	try {

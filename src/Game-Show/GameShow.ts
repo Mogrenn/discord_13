@@ -1,16 +1,37 @@
-import { CommandInteraction, Guild, GuildChannel, Snowflake, ThreadChannel } from "discord.js";
-import { gameShowPublic } from "../Common";
+import { ChannelType, CommandInteraction, Guild, GuildChannel, GuildTextThreadManager, Snowflake, ThreadChannel } from "discord.js";
+import { gameShowPublic, gameShowRoleName, gameShowRolePublic } from "../Common";
 
 export class GameShow {
     private guild: Guild;
     private result: {userId: Snowflake, answer: string}[];
     private acceptingAnswer = false;
-    private participantThreads: ThreadChannel[];
+    private participantThreads: {userId: Snowflake, thread: ThreadChannel}[] = [];
 
     constructor(interaction: CommandInteraction) {
         this.guild = interaction.guild;
-        const test = this.guild.channels.cache.find(c => c.name === gameShowPublic && !c.isThread());
+        const test = this.guild.channels.cache.find(c => c.name === gameShowPublic && (c.type === ChannelType.GuildText));
         
+        if (test.type === ChannelType.GuildText) {
+            const participants = test.members.map(m => {
+                const role = m.roles.cache.find(r => r.name === gameShowRolePublic);
+                if (role) {
+                    return m
+                }
+            }).filter(p => p !== undefined);
+            
+            participants.forEach(async p => {
+                const thread = await test.threads.create({
+                    name: p.user.username+"-private",
+                    type: ChannelType.PrivateThread
+                });
+
+                this.participantThreads.push({
+                    userId: p.id,
+                    thread: thread
+                });
+            });
+            
+        }
         
     }
 

@@ -1,5 +1,5 @@
 import { ChannelType, Client, Guild, Role } from "discord.js";
-import { gameShowRoleName, gameShowNameMaster, gameShowPublic } from "../consts";
+import { gameShowRoleName, gameShowNameMaster, gameShowPublic, gameShowRolePublic } from "../consts";
 import { CreateChannel } from "./Guild-Channel";
 
 export async function GameShowJoin({client, guild}: {client?: Client, guild?: Guild}) {
@@ -34,7 +34,7 @@ async function GameShowCreateRoleAndChannel(guild: Guild) {
             permissions: "Administrator"
         });
         await guild.roles.create({
-            name: "game-show-participant",
+            name: gameShowRolePublic,
         });
     }
 

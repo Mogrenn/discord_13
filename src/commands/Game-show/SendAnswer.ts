@@ -1,19 +1,18 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
-import { CreateGameShow } from "../../Game-Show";
+import { SendAnswer } from "../../Game-Show";
 
 const command = {
     data: new SlashCommandBuilder()
-        .setName("startgameshow")
-        .setDescription("Sends a guess to game-master-channel")
+        .setName("sendgameshowanswer")
+        .setDescription("Sends your guess to the server")
         .addStringOption(option =>
-            option.setName("name")
-                .setDescription("What is then name of the gameshow")
+            option.setName("guess")
+                .setDescription("Your guess")
                 .setRequired(true)
         ),
     async execute(interaction: CommandInteraction) {
-        await interaction.deferReply();
-        await CreateGameShow(interaction);
+        await SendAnswer(interaction);
     },
 };
 

@@ -40,6 +40,14 @@ const commands = [
 		.setRequired(true)
 	),
 	new SlashCommandBuilder().setName("startgameshow").setDescription("Starts a game show"),
+	new SlashCommandBuilder().setName("gameshowtoggleanswers").setDescription("toggles the option to listen for answers"),
+	new SlashCommandBuilder().setName("sendgameshowanswer").setDescription("Sends your guess to the server").addStringOption(option => 
+		option.setName("guess")
+		.setDescription("Your guess")
+		.setRequired(true)
+	),
+	new SlashCommandBuilder().setName("gameshowshowresult").setDescription("Shows the answers to all participants")
+
 ].map(c => c.toJSON());
 
 //Dev server, Friends server, fake reality server

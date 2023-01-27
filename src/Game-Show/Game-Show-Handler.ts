@@ -3,7 +3,7 @@ import { GameShow } from "./GameShow";
 
 class GameShowSingleton {
     static instance: GameShowSingleton;
-    gameShowSubscriptions = new Map<Snowflake, GameShow>()
+    private gameShowSubscriptions = new Map<Snowflake, GameShow>()
 
     static GetInstance() {
         if (!GameShowSingleton.instance)
@@ -17,7 +17,7 @@ class GameShowSingleton {
     }
 
     async CreateGameShow(interaction: CommandInteraction) {
-        if (this.gameShowSubscriptions.has(interaction.guildId)) {
+        if (await this.CheckGameShow(interaction.guildId)) {
             await interaction.reply({ephemeral: true, content: "Game is already started"});
             return;
         }
@@ -26,32 +26,45 @@ class GameShowSingleton {
     }
 
     async AcceptAnswers(interaction: CommandInteraction) {
-        if (this.CheckGameShow(interaction.guildId)) {
-            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+        if (!(await this.CheckGameShow(interaction.guildId))) {
+            await interaction.followUp({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
-            currentGameShow.AcceptQuestions();
+            await currentGameShow.AcceptQuestions(interaction);
         }
     }
 
     async ReceiveAnswer(interaction: CommandInteraction) {
-        if (this.CheckGameShow(interaction.guildId)) {
-            await interaction.reply({ephemeral: true, content: "There is no active game"});
+        if (!(await this.CheckGameShow(interaction.guildId))) {
+            await interaction.followUp({ephemeral: true, content: "There is no active game"});
         } else {
-            
+            const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
+            await currentGameShow.ReceiveAnswer(interaction);
         }
     }
 
     async SendResult(interaction: CommandInteraction) {
-        if (this.CheckGameShow(interaction.guildId)) {
+        if (!(await this.CheckGameShow(interaction.guildId))) {
             await interaction.reply({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
-            currentGameShow.ShowResult();
+            await currentGameShow.ShowResult();
         }
     }
 }
 
 export async function CreateGameShow(interaction: CommandInteraction) {
     await GameShowSingleton.GetInstance().CreateGameShow(interaction);
+}
+
+export async function ToggleAcceptAnswer(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().AcceptAnswers(interaction);
+}
+
+export async function SendAnswer(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().ReceiveAnswer(interaction);
+}
+
+export async function SendResult(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().SendResult(interaction);
 }

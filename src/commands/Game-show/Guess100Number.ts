@@ -12,6 +12,7 @@ const command = {
                 .setRequired(true)
         ),
     async execute(interaction: CommandInteraction) {
+        await interaction.deferReply();
         await Guess100(interaction);
     },
 };

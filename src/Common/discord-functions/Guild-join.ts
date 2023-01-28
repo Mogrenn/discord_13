@@ -5,10 +5,10 @@ import { CreateChannel } from "./Guild-Channel";
 export async function GameShowJoin({client, guild}: {client?: Client, guild?: Guild}) {
     if (client) {
         client.guilds.cache.forEach(async guild => {
-            GameShowCreateRoleAndChannel(guild);
+            await GameShowCreateRoleAndChannel(guild);
         });
     } else {
-        GameShowCreateRoleAndChannel(guild);
+        await GameShowCreateRoleAndChannel(guild);
     }
 }
 

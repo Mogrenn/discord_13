@@ -1,6 +1,6 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction, GuildMember } from "discord.js";
-import { gameShowNameMaster } from "../../Common";
+import { gameShowRoleName } from "../../Common";
 import { HasGuildRole } from "../../Common/discord-functions/Check-Discord-Role";
 import { ToggleAcceptAnswer } from "../../Game-Show";
 
@@ -14,8 +14,8 @@ const command = {
                 .setRequired(true)
         ),
     async execute(interaction: CommandInteraction) {
-        if (!(await HasGuildRole(interaction.member as GuildMember, gameShowNameMaster))) {
-            await interaction.reply({ephemeral: true, content: `Only ${gameShowNameMaster} have access to this command`});
+        if (!(await HasGuildRole(interaction.member as GuildMember, gameShowRoleName))) {
+            await interaction.reply({ephemeral: true, content: `Only ${gameShowRoleName} have access to this command`});
             return;
         }
         await interaction.deferReply();

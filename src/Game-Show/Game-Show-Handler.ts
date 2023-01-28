@@ -18,7 +18,7 @@ class GameShowSingleton {
 
     async CreateGameShow(interaction: CommandInteraction) {
         if (await this.CheckGameShow(interaction.guildId)) {
-            await interaction.reply({ephemeral: true, content: "Game is already started"});
+            await interaction.followUp({ephemeral: true, content: "Game is already started"});
             return;
         }
 
@@ -45,7 +45,7 @@ class GameShowSingleton {
 
     async SendResult(interaction: CommandInteraction) {
         if (!(await this.CheckGameShow(interaction.guildId))) {
-            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+            await interaction.followUp({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
             await currentGameShow.ShowResult(interaction);
@@ -54,7 +54,7 @@ class GameShowSingleton {
 
     async Set100Number(interaction: CommandInteraction) {
         if(!(await this.CheckGameShow(interaction.guildId))) {
-            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+            await interaction.followUp({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
             await currentGameShow.SetGameShowNumber(interaction);
@@ -63,7 +63,7 @@ class GameShowSingleton {
 
     async Show100Result(interaction: CommandInteraction) {
         if(!(await this.CheckGameShow(interaction.guildId))) {
-            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+            await interaction.followUp({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
             await currentGameShow.ShowResult100(interaction);
@@ -72,7 +72,7 @@ class GameShowSingleton {
 
     async Send100Answer(interaction: CommandInteraction) {
         if(!(await this.CheckGameShow(interaction.guildId))) {
-            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+            await interaction.followUp({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
             await currentGameShow.Guess100(interaction);
@@ -81,7 +81,7 @@ class GameShowSingleton {
 
     async Reset100(interaction: CommandInteraction) {
         if(!(await this.CheckGameShow(interaction.guildId))) {
-            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+            await interaction.followUp({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
             await currentGameShow.Reset100(interaction);

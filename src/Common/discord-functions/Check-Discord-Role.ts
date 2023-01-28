@@ -1,5 +1,6 @@
 import { GuildMember } from "discord.js";
 
 export async function HasGuildRole(user: GuildMember, roleName: string): Promise<boolean> {
-    return user.roles.cache.has(roleName);;
+    const test = user.roles.cache.filter(r => r.name === roleName);
+    return test.size > 0;
 }

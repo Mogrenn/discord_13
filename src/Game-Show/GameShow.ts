@@ -115,7 +115,7 @@ export class GameShow {
         const userIndex = this.roundResult.findIndex(u => u.userId === interaction.user.id);
         const val = interaction.options.get('guess', true).value;
 
-        if (userIndex > -1) {
+        if (userIndex === -1) {
             this.roundResult.push({userId: interaction.user.id, guess: val as number});
             await this.SendMessageToThreads(`${interaction.user.username} has guessed`, [interaction.user.id]);
             await this.SendMessageToGameMaster(`${interaction.user.username} has guessed: "${val}"`);
@@ -158,13 +158,13 @@ export class GameShow {
     
     async SetGameShowNumber(interaction: CommandInteraction) {
         if (this.currentNumber) {
-            return await interaction.reply("game mode alredy started");
+            return await interaction.followUp("game mode alredy started");
         }
         
         const val = interaction.options.get('number', true).value;
         this.currentNumber = val as number;
         await this.SendMessageToThreads(`Guess a 2 digit number`);
-        await interaction.reply("Game Started");
+        await interaction.followUp("Game Started");
     }
 
     async Reset100(interaction: CommandInteraction) {

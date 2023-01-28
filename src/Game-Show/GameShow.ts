@@ -65,7 +65,7 @@ export class GameShow {
             content: this.acceptingAnswer ? "Accepting" : "Not Accepting"+" answers"
         });
 
-        await this.SendMessageToThreads(this.acceptingAnswer ? `Voting has started` : `Voting has ended`);
+        await this.SendMessageToThreads(this.acceptingAnswer ? `Voting has started, use command /sendgameshowanswer` : `Voting has ended`);
     }
 
     async ShowResult(interaction: CommandInteraction) {

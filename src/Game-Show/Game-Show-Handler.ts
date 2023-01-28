@@ -48,7 +48,43 @@ class GameShowSingleton {
             await interaction.reply({ephemeral: true, content: "You don't have an active game"});
         } else {
             const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
-            await currentGameShow.ShowResult();
+            await currentGameShow.ShowResult(interaction);
+        }
+    }
+
+    async Set100Number(interaction: CommandInteraction) {
+        if(!(await this.CheckGameShow(interaction.guildId))) {
+            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+        } else {
+            const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
+            await currentGameShow.SetGameShowNumber(interaction);
+        }
+    }
+
+    async Show100Result(interaction: CommandInteraction) {
+        if(!(await this.CheckGameShow(interaction.guildId))) {
+            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+        } else {
+            const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
+            await currentGameShow.ShowResult100(interaction);
+        }
+    }
+
+    async Send100Answer(interaction: CommandInteraction) {
+        if(!(await this.CheckGameShow(interaction.guildId))) {
+            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+        } else {
+            const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
+            await currentGameShow.Guess100(interaction);
+        }
+    }
+
+    async Reset100(interaction: CommandInteraction) {
+        if(!(await this.CheckGameShow(interaction.guildId))) {
+            await interaction.reply({ephemeral: true, content: "You don't have an active game"});
+        } else {
+            const currentGameShow = this.gameShowSubscriptions.get(interaction.guildId);
+            await currentGameShow.Reset100(interaction);
         }
     }
 }
@@ -65,6 +101,18 @@ export async function SendAnswer(interaction: CommandInteraction) {
     await GameShowSingleton.GetInstance().ReceiveAnswer(interaction);
 }
 
-export async function SendResult(interaction: CommandInteraction) {
-    await GameShowSingleton.GetInstance().SendResult(interaction);
+export async function Show100Result(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().Show100Result(interaction);
+}
+
+export async function Guess100(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().Send100Answer(interaction);
+}
+
+export async function Reset100(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().Reset100(interaction);
+}
+
+export async function Set100Number(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().Set100Number(interaction);
 }

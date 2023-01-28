@@ -1,14 +1,13 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
-import { SendResult } from "../../Game-Show";
+import { Show100Result } from "../../Game-Show";
 
 const command = {
     data: new SlashCommandBuilder()
-        .setName("gameshowshowresult")
-        .setDescription("Shows the answers to all participants"),
+        .setName("show100result")
+        .setDescription("Shows the current standings"),
     async execute(interaction: CommandInteraction) {
-        await interaction.deferReply();
-        await SendResult(interaction);
+        await Show100Result(interaction);
     },
 };
 

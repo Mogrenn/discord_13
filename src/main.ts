@@ -71,7 +71,6 @@ client.on("messageCreate", async msg => {
 client.on("interactionCreate", async interaction => {
 
     if (!interaction.isCommand() || !interaction.guildId) return;
-    console.log(interaction.commandName);
     
     const command = client.commands.get(interaction.commandName);
 
@@ -79,10 +78,11 @@ client.on("interactionCreate", async interaction => {
         await command.execute(interaction);
     } catch(e) {
         console.log(e);
-        
-        console.log("Command not found");
-        
-        await interaction.reply("Could not find command");
+        if (!interaction.deferred && !interaction.replied)
+            await interaction.reply("Could not find command");
+        else if (interaction.deferred) {
+            await interaction.followUp("Could not find command");
+        }
     }
 });
 

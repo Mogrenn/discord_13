@@ -1,14 +1,13 @@
 import { SlashCommandBuilder } from "@discordjs/builders";
 import { CommandInteraction } from "discord.js";
-import { SendResult } from "../../Game-Show";
+import { Reset100 } from "../../Game-Show";
 
 const command = {
     data: new SlashCommandBuilder()
-        .setName("gameshowshowresult")
-        .setDescription("Shows the answers to all participants"),
+        .setName("reset100")
+        .setDescription("Resets the 100 game mode"),
     async execute(interaction: CommandInteraction) {
-        await interaction.deferReply();
-        await SendResult(interaction);
+        await Reset100(interaction);
     },
 };
 

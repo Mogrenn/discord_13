@@ -17,37 +17,48 @@ const commands = [
 	new SlashCommandBuilder().setName("leave").setDescription("Forces bot to leave voice channel"),
 	new SlashCommandBuilder().setName("search").setDescription("Search for a song").addStringOption(option => 
 		option.setName("search")
-		.setDescription("Text to search on")
-		.setRequired(true)	
+			.setDescription("Text to search on")
+			.setRequired(true)	
 	),
 	new SlashCommandBuilder().setName("playlist").setDescription("Play a playlist of songs").addStringOption(option => 
 		option.setName("playlist")
-		.setDescription("Enter a playlist url")
-		.setRequired(true)
+			.setDescription("Enter a playlist url")
+			.setRequired(true)
 	),
 	new SlashCommandBuilder().setName("shuffle").setDescription("Shuffle the queue"),
 	new SlashCommandBuilder().setName("loopsong").setDescription("Loop current song"),
 	new SlashCommandBuilder().setName("loopplaylist").setDescription("Loop current playlist"),
 	new SlashCommandBuilder().setName("volume").setDescription("Change the volume").addNumberOption(option => 
 		option.setName("newvolume")
-		.setDescription("The new volume")
-		.setRequired(true)
+			.setDescription("The new volume")
+			.setRequired(true)
 	),
 	new SlashCommandBuilder().setName("clearqueue").setDescription("Clears current song queue"),
 	new SlashCommandBuilder().setName("jump").setDescription("Jumps playlist to given position in current queue").addNumberOption(option => 
 		option.setName("target")
-		.setDescription("Position to jump to")
-		.setRequired(true)
+			.setDescription("Position to jump to")
+			.setRequired(true)
 	),
 	new SlashCommandBuilder().setName("startgameshow").setDescription("Starts a game show"),
 	new SlashCommandBuilder().setName("gameshowtoggleanswers").setDescription("toggles the option to listen for answers"),
 	new SlashCommandBuilder().setName("sendgameshowanswer").setDescription("Sends your guess to the server").addStringOption(option => 
 		option.setName("guess")
-		.setDescription("Your guess")
-		.setRequired(true)
+			.setDescription("Your guess")
+			.setRequired(true)
 	),
-	new SlashCommandBuilder().setName("gameshowshowresult").setDescription("Shows the answers to all participants")
-
+	new SlashCommandBuilder().setName("gameshowshowresult").setDescription("Shows the answers to all participants"),
+	new SlashCommandBuilder().setName("set100number").setDescription("Sets the number to guess").addNumberOption(option =>
+		option.setName("number")
+			.setDescription("Number to guess")
+			.setRequired(true)
+    ),
+	new SlashCommandBuilder().setName("guess100").setDescription("Sends your guess to the server").addNumberOption(option =>
+		option.setName("guess")
+			.setDescription("Your guess")
+			.setRequired(true)
+	),
+	new SlashCommandBuilder().setName("reset100").setDescription("Resets the 100 game mode"),
+	new SlashCommandBuilder().setName("show100result").setDescription("Shows the current standings")
 ].map(c => c.toJSON());
 
 //Dev server, Friends server, fake reality server

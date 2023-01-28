@@ -1,2 +1,2 @@
 export * from "./Guild-Channel";
-export * from "./Guild-Join";
+export * from "./Guild-join";

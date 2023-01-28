@@ -116,3 +116,7 @@ export async function Reset100(interaction: CommandInteraction) {
 export async function Set100Number(interaction: CommandInteraction) {
     await GameShowSingleton.GetInstance().Set100Number(interaction);
 }
+
+export async function SendResult(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().SendResult(interaction);
+} 

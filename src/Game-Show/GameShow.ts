@@ -13,6 +13,12 @@ export class GameShow {
 
     constructor(interaction: CommandInteraction) {
         this.guild = interaction.guild;
+        this.CreateThreads();
+
+        interaction.followUp("Game show created, remind users to join threads");
+    }
+
+    private async CreateThreads() {
         const publicChannel = this.guild.channels.cache.find(c => c.name === gameShowPublic && (c.type === ChannelType.GuildText));
         if (publicChannel.type === ChannelType.GuildText) {
             const participants = publicChannel.members.map(m => {
@@ -22,20 +28,21 @@ export class GameShow {
                 }
             }).filter(p => p !== undefined);
             
-            participants.forEach(async p => {
+            await Promise.all(participants.map(async p => {
                 const thread = await publicChannel.threads.create({
                     name: p.user.username+"-private",
-                    type: ChannelType.PrivateThread
+                    type: ChannelType.PrivateThread,
+                    autoArchiveDuration: 360
                 });
+
+                await thread.members.add(p.id);
 
                 this.participantThreads.push({
                     userId: p.id,
                     thread: thread
                 });
-            });
+            }));
         }
-
-        interaction.followUp("Game show created, remind users to join threads");
     }
 
     private async GetPrivateThreads() {
@@ -48,9 +55,9 @@ export class GameShow {
         // this.participantThreads.filter(p => exclude.includes(p.userId)).forEach(async t => await t.thread.send(msg));
     }
 
-    private async SendEmbedToThreads(embed: EmbedBuilder) {
+    private async SendEmbedToThreads(embed: EmbedBuilder[]) {
         const privateThreads = (this.guild.channels.cache.find(c => c.name === gameShowPublic && (c.type === ChannelType.GuildText)) as TextChannel).threads;
-        privateThreads.cache.forEach(async t => await t.send({embeds: [embed]}));
+        privateThreads.cache.forEach(async t => await t.send({embeds: embed}));
         // this.participantThreads.forEach(async t => await t.thread.send({embeds: [embed]}));
     }
 
@@ -84,7 +91,7 @@ export class GameShow {
             .setTitle("Vote results")
             .addFields(fields);
 
-        await this.SendEmbedToThreads(embed);
+        await this.SendEmbedToThreads([embed]);
         await interaction.followUp({embeds: [embed]});
         this.guessResult = [];
     }
@@ -142,18 +149,20 @@ export class GameShow {
         if (!this.currentNumber) {
             return;
         }
+        const embeds = [];
         
-        const embed = new EmbedBuilder()
-        .setColor(0x89CFF0)
-        .setTitle("Overall result")
-        .setDescription(`Correct answer was ${this.currentNumber}`)
 
         this.overallResult = this.overallResult.sort((a, b) => a.score - b.score);
 
         await Promise.all(this.overallResult.map(async oR => {
+            const embed = new EmbedBuilder()
+            .setColor(0x89CFF0)
+            .setTitle("Overall result")
+            .setDescription(`Correct answer was ${this.currentNumber}`)
             const currentUserIndex = this.roundResult.findIndex(rr => rr.userId === oR.userId);
             
             const bonusScore = await this.GetRoundBonus(currentUserIndex);
+
             embed.addFields(
                 {name: "User", value: this.guild.members.cache.find(member => member.id === oR.userId).user.username, inline: true},
                 {name: "Overall score", value: oR.score.toString(), inline: true},
@@ -172,13 +181,15 @@ export class GameShow {
             embed.addFields(
                 {name: '\u200B', value: '-----------------'} //Empty space
             )
+
+            embeds.push(embed);
         }));
              
         this.currentNumber = undefined;
         this.roundResult = [];
 
-        await this.SendEmbedToThreads(embed);
-        await interaction.followUp({embeds: [embed]});
+        await this.SendEmbedToThreads(embeds);
+        await interaction.followUp({embeds: embeds});
     }
 
     private async GetRoundBonus(userIndex: number): Promise<number> {

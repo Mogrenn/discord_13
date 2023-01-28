@@ -87,7 +87,7 @@ client.on("interactionCreate", async interaction => {
 });
 
 async function GetCommands() {
-    const filePath = join(__dirname, process.env.PROD === "true" ? "dist" : "", "commands");
+    const filePath = join(__dirname, process.env.PROD === "true" ? "" : "", "commands");
     const files = await GetFiles(filePath);
     
     let commandPromises: Array<Promise<void>> = [];

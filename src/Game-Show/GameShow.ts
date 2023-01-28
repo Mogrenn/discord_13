@@ -117,6 +117,20 @@ export class GameShow {
 
         if (userIndex === -1) {
             this.roundResult.push({userId: interaction.user.id, guess: val as number});
+            const currentUserIndex = this.roundResult.findIndex(rr => rr.userId === interaction.user.id);
+            const overallUserIndex = this.overallResult.findIndex(oR => oR.userId === interaction.user.id);
+
+            let diff = Math.abs(this.currentNumber - (val as number));
+
+            const bonus = await this.GetRoundBonus(currentUserIndex);
+            diff -= bonus;
+
+            if (overallUserIndex === -1) {
+                this.overallResult.push({userId: interaction.user.id, score: diff});
+            } else {
+                this.overallResult[overallUserIndex].score += diff;
+            }
+
             await this.SendMessageToThreads(`${interaction.user.username} has guessed`, [interaction.user.id]);
             await this.SendMessageToGameMaster(`${interaction.user.username} has guessed: "${val}"`);
         } else {
@@ -128,32 +142,57 @@ export class GameShow {
         if (!this.currentNumber) {
             return;
         }
-
-        this.roundResult.forEach(rs => {
-            const diff = Math.max(this.currentNumber - rs.guess);
-            const userIndex = this.roundResult.findIndex(u => u.userId === rs.userId);
-            
-            if (userIndex > -1) {
-                this.overallResult.push({userId: rs.userId, score: diff});
-            } else {
-                this.overallResult[userIndex].score += diff;
-            }
-        });
-
-        const fields = this.overallResult.map(ans => {
-            return {name: this.guild.members.cache.find(member => member.id === ans.userId).user.username, value: ans.score.toString(), inline: true}
-        }).sort((a, b) => parseInt(a.value) - parseInt(b.value));
         
         const embed = new EmbedBuilder()
-            .setColor(0x89CFF0)
-            .setTitle("Overall result")
-            .addFields(fields);
+        .setColor(0x89CFF0)
+        .setTitle("Overall result")
+        .setDescription(`Correct answer was ${this.currentNumber}`)
 
+        this.overallResult = this.overallResult.sort((a, b) => a.score - b.score);
+
+        await Promise.all(this.overallResult.map(async oR => {
+            const currentUserIndex = this.roundResult.findIndex(rr => rr.userId === oR.userId);
+            
+            const bonusScore = await this.GetRoundBonus(currentUserIndex);
+            embed.addFields(
+                {name: "User", value: this.guild.members.cache.find(member => member.id === oR.userId).user.username, inline: true},
+                {name: "Overall score", value: oR.score.toString(), inline: true},
+                {name: '\u200B', value: '\u200B'} //Empty space
+            )
+
+            embed.addFields(
+                {name: "Round guess", value: this.roundResult[currentUserIndex].guess.toString(), inline: true},
+            )
+
+            if (bonusScore > 0) {
+                embed.addFields(
+                    {name: "Bonus", value: bonusScore.toString(), inline: true},
+                )
+            }
+            embed.addFields(
+                {name: '\u200B', value: '-----------------'} //Empty space
+            )
+        }));
+             
         this.currentNumber = undefined;
         this.roundResult = [];
 
         await this.SendEmbedToThreads(embed);
         await interaction.followUp({embeds: [embed]});
+    }
+
+    private async GetRoundBonus(userIndex: number): Promise<number> {
+
+        switch (userIndex) {
+            case 0:
+                return 20;
+            case 1:
+                return 10;
+            case 2:
+                return 5;
+            default:
+                return 0
+        }
     }
     
     async SetGameShowNumber(interaction: CommandInteraction) {
@@ -163,7 +202,7 @@ export class GameShow {
         
         const val = interaction.options.get('number', true).value;
         this.currentNumber = val as number;
-        await this.SendMessageToThreads(`Guess a 2 digit number`);
+        await this.SendMessageToThreads(`Guess between 0-100 digit number, Use command /guess100`);
         await interaction.followUp("Game Started");
     }
 

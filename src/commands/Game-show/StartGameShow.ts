@@ -14,11 +14,6 @@ const command = {
                 .setRequired(true)
         ),
     async execute(interaction: CommandInteraction) {
-        console.log(interaction.member.roles);
-        console.log(gameShowRoleName);
-        
-        // console.log(await HasGuildRole(interaction.member as GuildMember, gameShowRoleName));
-        
         
         if (!(await HasGuildRole(interaction.member as GuildMember, gameShowRoleName))) {
             await interaction.reply({ephemeral: true, content: `Only ${gameShowRoleName} have access to this command`});

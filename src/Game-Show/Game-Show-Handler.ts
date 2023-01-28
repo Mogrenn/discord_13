@@ -25,6 +25,15 @@ class GameShowSingleton {
         this.gameShowSubscriptions.set(interaction.guildId, new GameShow(interaction));
     }
 
+    async RemoveGameShow(interaction: CommandInteraction) {
+        if (!(await this.CheckGameShow(interaction.guildId))) {
+            await interaction.followUp({ephemeral: true, content: "there is no Game-show active"});
+            return;
+        }
+        this.gameShowSubscriptions.delete(interaction.guildId);
+        await interaction.followUp("game show removed");
+    }
+
     async AcceptAnswers(interaction: CommandInteraction) {
         if (!(await this.CheckGameShow(interaction.guildId))) {
             await interaction.followUp({ephemeral: true, content: "You don't have an active game"});
@@ -119,4 +128,8 @@ export async function Set100Number(interaction: CommandInteraction) {
 
 export async function SendResult(interaction: CommandInteraction) {
     await GameShowSingleton.GetInstance().SendResult(interaction);
-} 
+}
+
+export async function RemoveGameShow(interaction: CommandInteraction) {
+    await GameShowSingleton.GetInstance().RemoveGameShow(interaction);
+}

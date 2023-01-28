@@ -58,7 +58,8 @@ const commands = [
 			.setRequired(true)
 	),
 	new SlashCommandBuilder().setName("reset100").setDescription("Resets the 100 game mode"),
-	new SlashCommandBuilder().setName("show100result").setDescription("Shows the current standings")
+	new SlashCommandBuilder().setName("show100result").setDescription("Shows the current standings"),
+	new SlashCommandBuilder().setName("removegameshow").setDescription("Removes the gameshow")
 ].map(c => c.toJSON());
 
 //Dev server, Friends server, fake reality server
